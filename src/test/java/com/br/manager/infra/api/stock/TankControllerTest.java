@@ -3,8 +3,11 @@ package com.br.manager.infra.api.stock;
 import com.br.manager.domain.stock.dto.FuelInputDTO;
 import com.br.manager.domain.stock.dto.FuelResponseDTO;
 import com.br.manager.domain.stock.repository.FuelRepository;
+import com.br.manager.domain.stock.repository.TankRepository;
 import com.br.manager.domain.stock.service.FuelService;
+import com.br.manager.domain.stock.service.TankService;
 import com.br.manager.infra.api.stock.factory.FuelInputDTOFactory;
+import com.br.manager.infra.api.stock.factory.TankInputDTOFactory;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
@@ -24,22 +27,22 @@ import static org.hamcrest.Matchers.containsString;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-class FuelControllerTest {
+class TankControllerTest {
 
     @LocalServerPort
     private int port;
 
     @Autowired
-    private FuelService service;
+    private TankService service;
 
     @Autowired
-    private FuelInputDTOFactory fuelInputDTOFactory;
+    private TankInputDTOFactory tankInputDTOFactory;
 
     @Autowired
-    private FuelRepository fuelRepository;
+    private TankRepository tankRepository;
 
     @Autowired
-    private FuelService fuelService;
+    private TankService fuelService;
 
     @BeforeEach
     public void beforeEach(){
@@ -49,23 +52,24 @@ class FuelControllerTest {
 
     @AfterEach
     public void afterAll(){
-        fuelRepository.deleteAll();
+        tankRepository.deleteAll();
     }
 
     @Test
     void shouldCreateFuelWithSuccess(){
         given()
            .contentType(ContentType.JSON)
-           .body(fuelInputDTOFactory.getFuelInputDTOFactory())
+           .body(tankInputDTOFactory.getTankInputDTOFactory())
         .when()
-           .post("/fuel")
+           .post("/tank")
         .then()
            .log().all()
            .statusCode(200)
-        .body(containsString("Nome combustivel"))
+        .body(containsString("Gasolina"))
         .body(containsString("LITERS"));
     }
 
+/*
     @Test
     void shouldReturnExceptionCreateFuel(){
         FuelInputDTO dto = fuelInputDTOFactory.getFuelInputDTOFactory();
@@ -158,5 +162,6 @@ class FuelControllerTest {
 
         Assertions.assertEquals("Menphis Depay", fuel.getName());
     }
+*/
 
 }

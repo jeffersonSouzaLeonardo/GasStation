@@ -2,6 +2,7 @@ package com.br.manager.infra.api.stock.controller;
 
 import com.br.manager.domain.stock.dto.FuelInputDTO;
 import com.br.manager.domain.stock.dto.FuelResponseDTO;
+import com.br.manager.domain.stock.dto.TankInputDTO;
 import com.br.manager.domain.stock.dto.TankResponseDTO;
 import com.br.manager.domain.stock.service.FuelService;
 import com.br.manager.domain.stock.service.TankService;
@@ -25,9 +26,9 @@ import java.util.List;
 public class TankController {
 
     @Autowired
-    private TankService fuelService;
+    private TankService tankService;
 
-/*
+
     @PostMapping
     public ResponseEntity<TankResponseDTO> create(@RequestBody TankInputDTO inputDTO){
         TankResponseDTO tankResponseDTO = tankService.save(inputDTO);
@@ -35,7 +36,7 @@ public class TankController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FankResponseDTO>> getAll(){
+    public ResponseEntity<List<TankResponseDTO>> getAll(){
         return ResponseEntity.ok(tankService.findAll());
     }
 
@@ -51,10 +52,9 @@ public class TankController {
     }
 
     @PutMapping()
-    public ResponseEntity<TankResponseDTO> edit(@RequestBody FankInputDTO inputDTO){
+    public ResponseEntity<TankResponseDTO> edit(@RequestBody TankInputDTO inputDTO){
         TankResponseDTO tankResponseDTO = tankService.save(inputDTO);
         return ResponseEntity.ok(tankResponseDTO);
     }
-*/
 
 }

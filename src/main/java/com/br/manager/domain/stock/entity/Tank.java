@@ -20,7 +20,7 @@ public class Tank {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "id_full")
+    @JoinColumn(name = "id_fuel")
     @NotNull(message = "Combustível é obrigatório.")
     private Fuel fuel;
 
@@ -28,7 +28,7 @@ public class Tank {
     @DecimalMin(value = "0.0001", message = "Capacidade deve ser maior que zero.")
     private BigDecimal capacity;
 
-    @NotBlank(message = "O nome do produto é obrigatório.")
+    @NotBlank(message = "O nome do tanque é obrigatório.")
     @Size(min = 3, max = 50, message = "O nome deve ter entre 3 e 50 caracteres.")
     private String identity;
 

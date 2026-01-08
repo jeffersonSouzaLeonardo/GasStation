@@ -1,10 +1,13 @@
 package com.br.manager.domain.stock.dto;
 
+import com.br.manager.domain.stock.entity.StatusFuelEnum;
+import com.br.manager.domain.stock.entity.UnitFuelEnum;
+
 public class FuelResponseDTO {
     private Long id;
     private String name;
-    private String unit;
-    private Boolean active;
+    private UnitFuelEnum unit;
+    private StatusFuelEnum status;
     private String idAnp;
 
     public Long getId() {
@@ -23,20 +26,12 @@ public class FuelResponseDTO {
         this.name = name;
     }
 
-    public String getUnit() {
+    public UnitFuelEnum getUnit() {
         return unit;
     }
 
-    public void setUnit(String unit) {
+    public void setUnit(UnitFuelEnum unit) {
         this.unit = unit;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
     }
 
     public String getIdAnp() {
@@ -45,5 +40,13 @@ public class FuelResponseDTO {
 
     public void setIdAnp(String idAnp) {
         this.idAnp = idAnp;
+    }
+
+    public StatusFuelEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusFuelEnum status) {
+        this.status = status;
     }
 }
