@@ -1,8 +1,8 @@
 package com.br.manager.infra.api.stock.factory;
 
 import com.br.manager.domain.stock.dto.FuelInputDTO;
-import com.br.manager.domain.stock.entity.StatusFuelEnum;
-import com.br.manager.domain.stock.entity.UnitFuelEnum;
+import com.br.manager.domain.stock.enums.StatusFuelEnum;
+import com.br.manager.domain.stock.enums.UnitFuelEnum;
 import org.springframework.stereotype.Component;
 
 @Component

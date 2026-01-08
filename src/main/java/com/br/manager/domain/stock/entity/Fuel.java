@@ -1,5 +1,7 @@
 package com.br.manager.domain.stock.entity;
 
+import com.br.manager.domain.stock.enums.StatusFuelEnum;
+import com.br.manager.domain.stock.enums.UnitFuelEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,7 +11,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.mapstruct.Mapper;
 
 @Entity
 public class Fuel {

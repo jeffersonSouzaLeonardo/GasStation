@@ -1,7 +1,7 @@
 package com.br.manager.domain.stock.dto;
 
-import com.br.manager.domain.stock.entity.StatusFuelEnum;
-import com.br.manager.domain.stock.entity.UnitFuelEnum;
+import com.br.manager.domain.stock.enums.StatusFuelEnum;
+import com.br.manager.domain.stock.enums.UnitFuelEnum;
 
 public class FuelResponseDTO {
     private Long id;
