@@ -2,10 +2,14 @@ package com.br.manager.domain.stock.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.mapstruct.Mapper;
 
 @Entity
 public class Fuel {
@@ -16,10 +20,15 @@ public class Fuel {
     @NotBlank(message = "O nome do combustível é obrigatório.")
     private String name;
 
-    @NotBlank(message = "A unidade de medida é obrigatório.")
-    private String unit;
+    @NotNull(message = "A unidade de medida é obrigatório.")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "unit")
+    private UnitFuelEnum unitFuelEnum;
 
-    private Boolean active;
+    @NotNull(message = "O Status do combustível é obrigatório.")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private StatusFuelEnum statusFuelEnum;
 
     @Column(name = "id_anp")
     private String idAnp;
@@ -40,20 +49,12 @@ public class Fuel {
         this.name = name;
     }
 
-    public String getUnit() {
-        return unit;
+    public UnitFuelEnum getUnit() {
+        return unitFuelEnum;
     }
 
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
+    public void setUnit(UnitFuelEnum unit) {
+        this.unitFuelEnum = unit;
     }
 
     public String getIdAnp() {
@@ -62,5 +63,21 @@ public class Fuel {
 
     public void setIdAnp(String idAnp) {
         this.idAnp = idAnp;
+    }
+
+    public UnitFuelEnum getUnitFuelEnum() {
+        return unitFuelEnum;
+    }
+
+    public void setUnitFuelEnum(UnitFuelEnum unitFuelEnum) {
+        this.unitFuelEnum = unitFuelEnum;
+    }
+
+    public StatusFuelEnum getStatusFuelEnum() {
+        return statusFuelEnum;
+    }
+
+    public void setStatusFuelEnum(StatusFuelEnum statusFuelEnum) {
+        this.statusFuelEnum = statusFuelEnum;
     }
 }
