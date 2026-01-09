@@ -24,12 +24,12 @@ public class Fuel {
     @NotNull(message = "A unidade de medida é obrigatório.")
     @Enumerated(EnumType.STRING)
     @Column(name = "unit")
-    private UnitFuelEnum unitFuelEnum;
+    private UnitFuelEnum unit;
 
     @NotNull(message = "O Status do combustível é obrigatório.")
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private StatusFuelEnum statusFuelEnum;
+    private StatusFuelEnum status;
 
     @Column(name = "id_anp")
     private String idAnp;
@@ -50,14 +50,6 @@ public class Fuel {
         this.name = name;
     }
 
-    public UnitFuelEnum getUnit() {
-        return unitFuelEnum;
-    }
-
-    public void setUnit(UnitFuelEnum unit) {
-        this.unitFuelEnum = unit;
-    }
-
     public String getIdAnp() {
         return idAnp;
     }
@@ -66,19 +58,19 @@ public class Fuel {
         this.idAnp = idAnp;
     }
 
-    public UnitFuelEnum getUnitFuelEnum() {
-        return unitFuelEnum;
+    public UnitFuelEnum getUnit() {
+        return unit;
     }
 
-    public void setUnitFuelEnum(UnitFuelEnum unitFuelEnum) {
-        this.unitFuelEnum = unitFuelEnum;
+    public void setUnit(UnitFuelEnum unit) {
+        this.unit = unit;
     }
 
-    public StatusFuelEnum getStatusFuelEnum() {
-        return statusFuelEnum;
+    public StatusFuelEnum getStatus() {
+        return status;
     }
 
-    public void setStatusFuelEnum(StatusFuelEnum statusFuelEnum) {
-        this.statusFuelEnum = statusFuelEnum;
+    public void setStatus(StatusFuelEnum status) {
+        this.status = status;
     }
 }

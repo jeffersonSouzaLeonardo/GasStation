@@ -4,6 +4,7 @@ import com.br.manager.domain.stock.enums.StatusFuelEnum;
 import com.br.manager.domain.stock.enums.UnitFuelEnum;
 
 public class FuelInputDTO {
+    private Long id;
     private String name;
     private UnitFuelEnum unit;
     private StatusFuelEnum status;
@@ -39,5 +40,13 @@ public class FuelInputDTO {
 
     public void setIdAnp(String idAnp) {
         this.idAnp = idAnp;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

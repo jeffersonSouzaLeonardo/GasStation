@@ -3,6 +3,7 @@ package com.br.manager.infra.api.stock.controller;
 import com.br.manager.domain.stock.dto.FuelInputDTO;
 import com.br.manager.domain.stock.dto.FuelResponseDTO;
 import com.br.manager.domain.stock.service.FuelService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +23,15 @@ import java.util.List;
 @RequestMapping("/fuel")
 public class FuelController {
 
-    @Autowired
-    private FuelService fuelService;
-
+    @Valid
     @PostMapping
     public ResponseEntity<FuelResponseDTO> create(@RequestBody FuelInputDTO inputDTO){
-        FuelResponseDTO fuelResponseDTO = fuelService.save(inputDTO);
+        FuelResponseDTO fuelResponseDTO = fuelService.create(inputDTO);
         return ResponseEntity.ok(fuelResponseDTO);
     }
+
+    @Autowired
+    private FuelService fuelService;
 
     @GetMapping
     public ResponseEntity<List<FuelResponseDTO>> getAll(){
@@ -47,9 +49,10 @@ public class FuelController {
         fuelService.delete(id);
     }
 
+    @Valid
     @PutMapping()
-    public ResponseEntity<FuelResponseDTO> edit(@RequestBody FuelInputDTO inputDTO){
-        FuelResponseDTO fuelResponseDTO = fuelService.save(inputDTO);
+    public ResponseEntity<FuelResponseDTO> update(@RequestBody FuelInputDTO inputDTO){
+        FuelResponseDTO fuelResponseDTO = fuelService.update(inputDTO);
         return ResponseEntity.ok(fuelResponseDTO);
     }
 
