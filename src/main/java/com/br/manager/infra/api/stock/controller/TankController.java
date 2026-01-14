@@ -30,6 +30,7 @@ public class TankController {
     public ResponseEntity<TankResponseDTO> create(@RequestBody TankInputDTO inputDTO){
         TankResponseDTO tankResponseDTO = tankService.create(inputDTO);
         return ResponseEntity.ok(tankResponseDTO);
+
     }
 
     @GetMapping
