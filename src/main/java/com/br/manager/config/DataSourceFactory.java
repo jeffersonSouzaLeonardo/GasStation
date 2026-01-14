@@ -1,5 +1,7 @@
 package com.br.manager.config;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -23,15 +25,29 @@ public class DataSourceFactory {
         for (String tenant : tenants) {
             DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
             try {
-                dataSourceBuilder.driverClassName(dataSourceDefaultConfig.getDriverClassName());
-                dataSourceBuilder.username(dataSourceDefaultConfig.getUsername());
-                dataSourceBuilder.password(dataSourceDefaultConfig.getPassword());
-                dataSourceBuilder.url(dataSourceDefaultConfig.getUrl() + tenant  );
-                resolvedDataSources.put(tenant, dataSourceBuilder.build());
+                HikariDataSource ds = getHikariDataSource(tenant);
+                resolvedDataSources.put(tenant, ds);
             } catch (Exception exp) {
                 throw new RuntimeException("Problem in tenant datasource:" + exp);
             }
         }
         return resolvedDataSources;
+    }
+
+    private HikariDataSource getHikariDataSource(String tenant) {
+        HikariConfig config = new HikariConfig();
+
+        config.setJdbcUrl(dataSourceDefaultConfig.getUrl() + tenant);
+        config.setUsername(dataSourceDefaultConfig.getUsername());
+        config.setPassword(dataSourceDefaultConfig.getPassword());
+        config.setDriverClassName(dataSourceDefaultConfig.getDriverClassName());
+
+        // 2. CONFIGURAÇÃO DO POOL
+        config.setMaximumPoolSize(5);  // Define o máximo de conexões (Ex: 5)
+        config.setMinimumIdle(2);      // Conexões mínimas sempre abertas
+        config.setPoolName("HikariPool-" + tenant); // Facilita ver no Log qual banco é qual
+
+        HikariDataSource ds = new HikariDataSource(config);
+        return ds;
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import javax.sql.DataSource;
 import java.util.Map;
 
-@Profile({"dev", "prod"})
+@Profile({"dev"})
 @Configuration
 public class DefinitionDataSourceConfiguration {
     private static final Logger logger = LogManager.getLogger(DefinitionDataSourceConfiguration.class);
