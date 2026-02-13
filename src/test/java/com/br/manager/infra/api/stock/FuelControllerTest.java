@@ -88,7 +88,7 @@ class FuelControllerTest {
     @Test
     void shouldReturnListWithFuel(){
         for (int i = 0; i < 2; i++) {
-           fuelService.save(fuelInputDTOFactory.getFuelInputDTOFactory());
+           fuelService.create(fuelInputDTOFactory.getFuelInputDTOFactory());
         }
 
         TypeRef<List<FuelResponseDTO>> typeRef = new TypeRef<List<FuelResponseDTO>>() {};
@@ -108,7 +108,7 @@ class FuelControllerTest {
 
     @Test
     void shouldReturnOneFuel(){
-        FuelResponseDTO responseDTO = fuelService.save(fuelInputDTOFactory.getFuelInputDTOFactory());
+        FuelResponseDTO responseDTO = fuelService.create(fuelInputDTOFactory.getFuelInputDTOFactory());
 
         TypeRef<FuelResponseDTO> typeRef = new TypeRef<FuelResponseDTO>() {};
 
@@ -127,7 +127,7 @@ class FuelControllerTest {
 
     @Test
     void shouldDeleteFuel(){
-        FuelResponseDTO responseDTO = fuelService.save(fuelInputDTOFactory.getFuelInputDTOFactory());
+        FuelResponseDTO responseDTO = fuelService.create(fuelInputDTOFactory.getFuelInputDTOFactory());
 
         RestAssured.given()
                 .contentType(ContentType.JSON)

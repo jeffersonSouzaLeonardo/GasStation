@@ -20,7 +20,7 @@ public class FuelEntityFactory {
     private FuelRepository fuelRepository;
 
     public Fuel getFuel(){
-        FuelResponseDTO dto = service.save(fuelInputDTOFactory.getFuelInputDTOFactory());
+        FuelResponseDTO dto = service.create(fuelInputDTOFactory.getFuelInputDTOFactory());
         return fuelRepository.findById(dto.getId()).get();
     }
 

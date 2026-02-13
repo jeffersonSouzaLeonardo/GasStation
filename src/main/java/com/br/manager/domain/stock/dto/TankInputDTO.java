@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 
 public class TankInputDTO {
     private Long id;
-    private Fuel fuel;
+    private Long fuel;
     private BigDecimal capacity;
     private String identity;
     private BigDecimal volume;
@@ -19,11 +19,11 @@ public class TankInputDTO {
         this.id = id;
     }
 
-    public Fuel getFuel() {
+    public Long getFuel() {
         return fuel;
     }
 
-    public void setFuel(Fuel fuel) {
+    public void setFuel(Long fuel) {
         this.fuel = fuel;
     }
 

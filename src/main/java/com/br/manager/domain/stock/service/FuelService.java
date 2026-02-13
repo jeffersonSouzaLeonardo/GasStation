@@ -9,6 +9,7 @@ import com.br.manager.infra.api.stock.mapper.FuelMapper;
 import io.micrometer.common.util.StringUtils;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class FuelService {
     @Autowired
     private FuelMapper fuelMapper;
 
-    public FuelResponseDTO save(FuelInputDTO inputDTO){
+    public FuelResponseDTO create(FuelInputDTO inputDTO){
         try {
             Fuel fuel = fuelMapper.fuelInputToFuelEntity(inputDTO);
             return fuelMapper.fuelEntityToFuelResponseDTO(fuelRepository.saveAndFlush(fuel));
@@ -42,29 +43,62 @@ public class FuelService {
         }
     }
 
-    public List<FuelResponseDTO> findAll(){
+    public FuelResponseDTO update(FuelInputDTO inputDTO){
         try {
 
-            return fuelMapper.listFuelEntityToListFuelResponseDTO(fuelRepository.findAll());
+            Fuel fuel = fuelRepository.findById(inputDTO.getId())
+                    .orElseThrow(() -> new BusinessException(String.format("ID %s não encontrado", inputDTO.getId())));
 
-        } catch (Exception e ){
-            throw new BusinessException(e.getMessage());
+            fuelMapper.updateFuelFromDto(inputDTO, fuel);
+
+            Fuel fuelSave = fuelRepository.saveAndFlush(fuel);
+            return fuelMapper.fuelEntityToFuelResponseDTO(fuelSave);
+
+        } catch (ConstraintViolationException constraintViolationException){
+            List<String> validationError = constraintViolationException.getConstraintViolations().stream()
+                    .map(v -> v.getMessage().toString())
+                    .collect(Collectors.toList());
+            throw new BusinessException(validationError.toString());
+        } catch (Exception e){
+            String fuelName = "";
+            if( StringUtils.isNotBlank(inputDTO.getName())) {
+                fuelName = inputDTO.getName();
+            }
+            throw new BusinessException("Erro ao salvar combustível " + fuelName, e);
         }
     }
 
+
+    public List<FuelResponseDTO> findAll(){
+        return fuelRepository.findAll()
+                .stream()
+                .map(fuelMapper::fuelEntityToFuelResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<FuelResponseDTO> findByDescription(String description){
+        return fuelRepository.findByNameContainingIgnoreCase(description)
+                .stream()
+                .map(fuelMapper::fuelEntityToFuelResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     public FuelResponseDTO find(Long id){
-        try {
-            return fuelMapper.fuelEntityToFuelResponseDTO(fuelRepository.findById(id).get());
-        } catch (Exception e ){
-            throw new BusinessException(e.getMessage());
-        }
+        return fuelRepository.findById(id)
+                .map(fuelMapper::fuelEntityToFuelResponseDTO)
+                .orElseThrow(()-> new BusinessException(String.format("Combustível não encontrado com o ID: %s", id)));
     }
 
     public void delete(Long id){
         try {
-            fuelRepository.deleteById(id);
+            fuelRepository.findById(id)
+                    .ifPresentOrElse(fuelRepository::delete,
+                            ()-> {throw new BusinessException("Combustível ID:%s não encontrado para exclusão");});
+
+        } catch (DataIntegrityViolationException eDataIntegrityViolationException){
+            throw new BusinessException(String.format("Não é possível excluir o combustível ID: %s, pois ele está associado a outros registros.", id));
         } catch (Exception e ){
-            throw new BusinessException(e.getMessage());
+            throw new BusinessException(String.format("Erro ao excluir o combustível ID: %s", id));
         }
     }
 

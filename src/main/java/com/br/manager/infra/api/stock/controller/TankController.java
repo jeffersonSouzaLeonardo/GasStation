@@ -1,10 +1,7 @@
 package com.br.manager.infra.api.stock.controller;
 
-import com.br.manager.domain.stock.dto.FuelInputDTO;
-import com.br.manager.domain.stock.dto.FuelResponseDTO;
 import com.br.manager.domain.stock.dto.TankInputDTO;
 import com.br.manager.domain.stock.dto.TankResponseDTO;
-import com.br.manager.domain.stock.service.FuelService;
 import com.br.manager.domain.stock.service.TankService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,7 +28,7 @@ public class TankController {
 
     @PostMapping
     public ResponseEntity<TankResponseDTO> create(@RequestBody TankInputDTO inputDTO){
-        TankResponseDTO tankResponseDTO = tankService.save(inputDTO);
+        TankResponseDTO tankResponseDTO = tankService.create(inputDTO);
         return ResponseEntity.ok(tankResponseDTO);
     }
 
@@ -53,7 +50,7 @@ public class TankController {
 
     @PutMapping()
     public ResponseEntity<TankResponseDTO> edit(@RequestBody TankInputDTO inputDTO){
-        TankResponseDTO tankResponseDTO = tankService.save(inputDTO);
+        TankResponseDTO tankResponseDTO = tankService.create(inputDTO);
         return ResponseEntity.ok(tankResponseDTO);
     }
 
