@@ -20,6 +20,16 @@ class TenantFilter implements Filter {
                          FilterChain chain) throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
+
+        // --- CÓDIGO PARA VER TODOS OS HEADERS ---
+        System.out.println("====== INICIO DOS HEADERS ======");
+        java.util.Collections.list(req.getHeaderNames()).forEach(headerName -> {
+            String headerValue = req.getHeader(headerName);
+            System.out.println(headerName + ": " + headerValue);
+        });
+        System.out.println("====== FIM DOS HEADERS ======");
+        // ----------------------------------------
+
         String tenantName = req.getHeader("x-tenant-id");
         TenantContext.setCurrentTenant(tenantName);
 

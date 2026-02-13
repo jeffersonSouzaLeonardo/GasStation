@@ -9,6 +9,7 @@ import com.br.manager.infra.api.stock.mapper.FuelMapper;
 import io.micrometer.common.util.StringUtils;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -75,6 +76,13 @@ public class FuelService {
                 .collect(Collectors.toList());
     }
 
+    public List<FuelResponseDTO> findByDescription(String description){
+        return fuelRepository.findByNameContainingIgnoreCase(description)
+                .stream()
+                .map(fuelMapper::fuelEntityToFuelResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     public FuelResponseDTO find(Long id){
         return fuelRepository.findById(id)
                 .map(fuelMapper::fuelEntityToFuelResponseDTO)
@@ -87,6 +95,8 @@ public class FuelService {
                     .ifPresentOrElse(fuelRepository::delete,
                             ()-> {throw new BusinessException("Combustível ID:%s não encontrado para exclusão");});
 
+        } catch (DataIntegrityViolationException eDataIntegrityViolationException){
+            throw new BusinessException(String.format("Não é possível excluir o combustível ID: %s, pois ele está associado a outros registros.", id));
         } catch (Exception e ){
             throw new BusinessException(String.format("Erro ao excluir o combustível ID: %s", id));
         }
