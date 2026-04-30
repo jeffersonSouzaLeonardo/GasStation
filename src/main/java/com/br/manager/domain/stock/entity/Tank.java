@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 public class Tank {
@@ -34,6 +35,9 @@ public class Tank {
     private String identity;
 
     private BigDecimal volume;
+
+    @Column(name = "deleted")
+    private LocalDateTime deleted;
 
     public Long getId() {
         return id;
@@ -73,5 +77,13 @@ public class Tank {
 
     public void setVolume(BigDecimal volume) {
         this.volume = volume;
+    }
+
+    public LocalDateTime getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(LocalDateTime deleted) {
+        this.deleted = deleted;
     }
 }
