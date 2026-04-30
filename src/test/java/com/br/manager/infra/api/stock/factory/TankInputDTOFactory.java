@@ -16,7 +16,7 @@ public class TankInputDTOFactory {
         TankInputDTO tankInputDTO = new TankInputDTO();
         tankInputDTO.setIdentity("Gasolina");
         tankInputDTO.setCapacity(new BigDecimal(10.000));
-        tankInputDTO.setFuel(fuelEntityFactory.getFuel());
+        //tankInputDTO.setFuel(fuelEntityFactory.getFuel());
         tankInputDTO.setVolume(new BigDecimal(2.000));
         return tankInputDTO;
 

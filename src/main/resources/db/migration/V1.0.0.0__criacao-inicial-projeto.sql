@@ -6,6 +6,7 @@ CREATE TABLE `beak` (
   `identity` varchar(100) NOT NULL,
   `hodometro` decimal(15,3) NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT '1',
+  `deleted` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -15,12 +16,14 @@ CREATE TABLE `bomb` (
   `identity` varchar(100) NOT NULL,
   `unidade_medida` varchar(10) NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT '1',
+  `deleted` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `empresa` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `nome` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -30,6 +33,7 @@ CREATE TABLE `fuel` (
   `unit` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `status` varchar(30) NOT NULL DEFAULT '1',
   `id_anp` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -39,6 +43,7 @@ CREATE TABLE `tank` (
   `capacity` decimal(10,2) NOT NULL,
   `identity` varchar(100) NOT NULL,
   `volume` decimal(10,2) NOT NULL,
+  `deleted` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

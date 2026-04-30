@@ -12,6 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class Fuel {
     @Id
@@ -33,6 +35,9 @@ public class Fuel {
 
     @Column(name = "id_anp")
     private String idAnp;
+
+    @Column(name = "deleted")
+    private LocalDateTime deleted;
 
     public Long getId() {
         return id;
@@ -56,6 +61,14 @@ public class Fuel {
 
     public void setIdAnp(String idAnp) {
         this.idAnp = idAnp;
+    }
+
+    public LocalDateTime getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(LocalDateTime deleted) {
+        this.deleted = deleted;
     }
 
     public UnitFuelEnum getUnit() {

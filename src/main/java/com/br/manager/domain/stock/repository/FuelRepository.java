@@ -8,5 +8,9 @@ import java.util.List;
 
 @Repository
 public interface FuelRepository extends JpaRepository<Fuel, Long> {
-    List<Fuel> findByNameContainingIgnoreCase(String name);
+    List<Fuel> findByNameContainingIgnoreCaseAndDeletedIsNull(String name);
+
+    Fuel findByIdAndDeletedIsNull(Long id);
+
+    List<Fuel> findAllByDeletedIsNull();
 }

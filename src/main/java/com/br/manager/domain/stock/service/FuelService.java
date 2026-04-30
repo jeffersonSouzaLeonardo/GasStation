@@ -1,6 +1,7 @@
 package com.br.manager.domain.stock.service;
 
 import com.br.manager.common.BusinessException;
+import com.br.manager.common.NotFoundBusinessException;
 import com.br.manager.domain.stock.dto.FuelInputDTO;
 import com.br.manager.domain.stock.dto.FuelResponseDTO;
 import com.br.manager.domain.stock.entity.Fuel;
@@ -9,9 +10,9 @@ import com.br.manager.infra.api.stock.mapper.FuelMapper;
 import io.micrometer.common.util.StringUtils;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,8 +47,11 @@ public class FuelService {
     public FuelResponseDTO update(FuelInputDTO inputDTO){
         try {
 
-            Fuel fuel = fuelRepository.findById(inputDTO.getId())
-                    .orElseThrow(() -> new BusinessException(String.format("ID %s não encontrado", inputDTO.getId())));
+            Fuel fuel = fuelRepository.findByIdAndDeletedIsNull(inputDTO.getId());
+
+            if (fuel == null) {
+                throw new NotFoundBusinessException(String.format("ID %s não encontrado", inputDTO.getId()));
+            }
 
             fuelMapper.updateFuelFromDto(inputDTO, fuel);
 
@@ -59,6 +63,8 @@ public class FuelService {
                     .map(v -> v.getMessage().toString())
                     .collect(Collectors.toList());
             throw new BusinessException(validationError.toString());
+        } catch (NotFoundBusinessException notFoundBusinessException){
+            throw notFoundBusinessException;
         } catch (Exception e){
             String fuelName = "";
             if( StringUtils.isNotBlank(inputDTO.getName())) {
@@ -70,36 +76,58 @@ public class FuelService {
 
 
     public List<FuelResponseDTO> findAll(){
-        return fuelRepository.findAll()
+        return fuelRepository.findAllByDeletedIsNull()
                 .stream()
                 .map(fuelMapper::fuelEntityToFuelResponseDTO)
                 .collect(Collectors.toList());
     }
 
     public List<FuelResponseDTO> findByDescription(String description){
-        return fuelRepository.findByNameContainingIgnoreCase(description)
+        return fuelRepository.findByNameContainingIgnoreCaseAndDeletedIsNull(description)
                 .stream()
                 .map(fuelMapper::fuelEntityToFuelResponseDTO)
                 .collect(Collectors.toList());
     }
 
     public FuelResponseDTO find(Long id){
-        return fuelRepository.findById(id)
-                .map(fuelMapper::fuelEntityToFuelResponseDTO)
-                .orElseThrow(()-> new BusinessException(String.format("Combustível não encontrado com o ID: %s", id)));
+        Fuel fuel  = fuelRepository.findByIdAndDeletedIsNull(id);
+
+         if (fuel == null) {
+            throw new NotFoundBusinessException(String.format("ID %s não encontrado", id));
+        }
+
+         return fuelMapper.fuelEntityToFuelResponseDTO(fuel);
     }
 
     public void delete(Long id){
         try {
-            fuelRepository.findById(id)
-                    .ifPresentOrElse(fuelRepository::delete,
-                            ()-> {throw new BusinessException("Combustível ID:%s não encontrado para exclusão");});
 
-        } catch (DataIntegrityViolationException eDataIntegrityViolationException){
-            throw new BusinessException(String.format("Não é possível excluir o combustível ID: %s, pois ele está associado a outros registros.", id));
-        } catch (Exception e ){
-            throw new BusinessException(String.format("Erro ao excluir o combustível ID: %s", id));
+            Fuel fuel = fuelRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("ID %s não encontrado", id)));
+
+            fuel.setDeleted(LocalDateTime.now());
+            fuelRepository.saveAndFlush(fuel);
+
+        } catch (ConstraintViolationException constraintViolationException){
+            List<String> validationError = constraintViolationException.getConstraintViolations().stream()
+                    .map(v -> v.getMessage().toString())
+                    .collect(Collectors.toList());
+            throw new BusinessException(validationError.toString());
+        } catch (NotFoundBusinessException notFoundBusinessException){
+            throw notFoundBusinessException;
+        } catch (Exception e){
+            throw new BusinessException("Erro ao deletar combustível ", e);
         }
+    }
+
+    public Fuel getFuelEntityById(Long id){
+        Fuel fuel  = fuelRepository.findByIdAndDeletedIsNull(id);
+
+        if (fuel == null) {
+            throw new NotFoundBusinessException(String.format("Combustível com ID %s não encontrado", id));
+        }
+
+        return fuel;
     }
 
 }
