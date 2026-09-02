@@ -1,0 +1,23 @@
+package com.br.manager.domain.organization.repository;
+
+import com.br.manager.domain.organization.entity.UserLink;
+import com.br.manager.domain.organization.enums.RoleTypeEnum;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.UUID;
+
+@Repository
+public interface UserLinkRepository extends JpaRepository<UserLink, UUID> {
+    List<UserLink> findAllByActiveTrue();
+
+    UserLink findByIdAndActiveTrue(UUID id);
+
+    List<UserLink> findByRoleAndActiveTrue(RoleTypeEnum role);
+
+    @Query("SELECT ul FROM UserLink ul WHERE ul.active = true AND LOWER(CAST(ul.role AS string)) LIKE LOWER(CONCAT('%', :text, '%'))")
+    List<UserLink> findByRoleTextAndActiveTrue(@Param("text") String text);
+}

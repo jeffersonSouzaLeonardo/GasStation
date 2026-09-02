@@ -1,9 +1,9 @@
 package com.br.manager.infra.api.stock.factory;
 
-import com.br.manager.domain.stock.dto.FuelResponseDTO;
-import com.br.manager.domain.stock.entity.Fuel;
-import com.br.manager.domain.stock.repository.FuelRepository;
-import com.br.manager.domain.stock.service.FuelService;
+import com.br.manager.domain.operational.dto.FuelResponseDTO;
+import com.br.manager.domain.operational.entity.Fuel;
+import com.br.manager.domain.operational.repository.FuelRepository;
+import com.br.manager.domain.operational.usecase.FuelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

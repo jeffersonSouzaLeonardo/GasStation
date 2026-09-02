@@ -1,6 +1,6 @@
 package com.br.manager.infra.api.stock.factory;
 
-import com.br.manager.domain.stock.dto.TankInputDTO;
+import com.br.manager.domain.operational.dto.TankInputDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

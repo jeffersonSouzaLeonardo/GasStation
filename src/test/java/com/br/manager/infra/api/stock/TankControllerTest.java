@@ -1,26 +1,17 @@
 package com.br.manager.infra.api.stock;
 
-import com.br.manager.domain.stock.dto.FuelInputDTO;
-import com.br.manager.domain.stock.dto.FuelResponseDTO;
-import com.br.manager.domain.stock.repository.FuelRepository;
-import com.br.manager.domain.stock.repository.TankRepository;
-import com.br.manager.domain.stock.service.FuelService;
-import com.br.manager.domain.stock.service.TankService;
-import com.br.manager.infra.api.stock.factory.FuelInputDTOFactory;
+import com.br.manager.domain.operational.repository.TankRepository;
+import com.br.manager.domain.operational.usecase.TankService;
 import com.br.manager.infra.api.stock.factory.TankInputDTOFactory;
 import io.restassured.RestAssured;
-import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;

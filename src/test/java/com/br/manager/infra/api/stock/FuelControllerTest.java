@@ -1,9 +1,9 @@
 package com.br.manager.infra.api.stock;
 
-import com.br.manager.domain.stock.dto.FuelInputDTO;
-import com.br.manager.domain.stock.dto.FuelResponseDTO;
-import com.br.manager.domain.stock.repository.FuelRepository;
-import com.br.manager.domain.stock.service.FuelService;
+import com.br.manager.domain.operational.dto.FuelInputDTO;
+import com.br.manager.domain.operational.dto.FuelResponseDTO;
+import com.br.manager.domain.operational.repository.FuelRepository;
+import com.br.manager.domain.operational.usecase.FuelService;
 import com.br.manager.infra.api.stock.factory.FuelInputDTOFactory;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
