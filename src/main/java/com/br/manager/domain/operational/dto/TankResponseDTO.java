@@ -1,53 +1,32 @@
 package com.br.manager.domain.operational.dto;
 
-import com.br.manager.domain.operational.entity.Fuel;
-
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class TankResponseDTO {
-    private Long id;
-    private Fuel fuel;
-    private BigDecimal capacity;
-    private String identity;
-    private BigDecimal volume;
+    private UUID id;
+    private UUID stationId;
+    private String code;
+    private UUID productId;
+    private BigDecimal capacityLiters;
+    private BigDecimal deadStockLiters;
+    private BigDecimal currentBookLiters;
+    private Boolean active;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Fuel getFuel() {
-        return fuel;
-    }
-
-    public void setFuel(Fuel fuel) {
-        this.fuel = fuel;
-    }
-
-    public BigDecimal getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(BigDecimal capacity) {
-        this.capacity = capacity;
-    }
-
-    public String getIdentity() {
-        return identity;
-    }
-
-    public void setIdentity(String identity) {
-        this.identity = identity;
-    }
-
-    public BigDecimal getVolume() {
-        return volume;
-    }
-
-    public void setVolume(BigDecimal volume) {
-        this.volume = volume;
-    }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
+    public UUID getStationId() { return stationId; }
+    public void setStationId(UUID stationId) { this.stationId = stationId; }
+    public String getCode() { return code; }
+    public void setCode(String code) { this.code = code; }
+    public UUID getProductId() { return productId; }
+    public void setProductId(UUID productId) { this.productId = productId; }
+    public BigDecimal getCapacityLiters() { return capacityLiters; }
+    public void setCapacityLiters(BigDecimal capacityLiters) { this.capacityLiters = capacityLiters; }
+    public BigDecimal getDeadStockLiters() { return deadStockLiters; }
+    public void setDeadStockLiters(BigDecimal deadStockLiters) { this.deadStockLiters = deadStockLiters; }
+    public BigDecimal getCurrentBookLiters() { return currentBookLiters; }
+    public void setCurrentBookLiters(BigDecimal currentBookLiters) { this.currentBookLiters = currentBookLiters; }
+    public Boolean getActive() { return active; }
+    public void setActive(Boolean active) { this.active = active; }
 }

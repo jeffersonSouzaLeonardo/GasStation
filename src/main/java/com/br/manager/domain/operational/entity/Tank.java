@@ -2,88 +2,69 @@ package com.br.manager.domain.operational.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
+@Table(name = "tanks")
 public class Tank {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id", nullable = false, updatable = false)
+    private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "id_fuel")
-    @NotNull(message = "Combustível é obrigatório.")
-    private Fuel fuel;
+    @NotNull(message = "Station ID is required.")
+    @Column(name = "station_id", nullable = false)
+    private UUID stationId;
 
-    @NotNull(message = "A capacidade é obrigatório.")
-    @DecimalMin(value = "0.0001", message = "Capacidade deve ser maior que zero.")
-    private BigDecimal capacity;
+    @NotBlank(message = "Tank code is required.")
+    @Column(name = "code", nullable = false, length = 50)
+    private String code;
 
-    @NotBlank(message = "O nome do tanque é obrigatório.")
-    @Size(min = 3, max = 50, message = "O nome deve ter entre 3 e 50 caracteres.")
-    private String identity;
+    @NotNull(message = "Product ID is required.")
+    @Column(name = "product_id", nullable = false)
+    private UUID productId;
 
-    private BigDecimal volume;
+    @NotNull(message = "Tank capacity is required.")
+    @DecimalMin(value = "0.0001", message = "Capacity must be greater than zero.")
+    @Column(name = "capacity_liters", nullable = false, precision = 15, scale = 4)
+    private BigDecimal capacityLiters;
 
-    @Column(name = "deleted")
-    private LocalDateTime deleted;
+    @Column(name = "dead_stock_liters", precision = 15, scale = 4)
+    private BigDecimal deadStockLiters = BigDecimal.ZERO;
 
-    public Long getId() {
-        return id;
-    }
+    @NotNull(message = "Current book liters is required.")
+    @Column(name = "current_book_liters", nullable = false, precision = 15, scale = 4)
+    private BigDecimal currentBookLiters = BigDecimal.ZERO;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @NotNull(message = "Active flag is required.")
+    @Column(name = "active", nullable = false)
+    private Boolean active = true;
 
-    public Fuel getFuel() {
-        return fuel;
-    }
+    @PrePersist
+    public void ensureId() { if (this.id == null) { this.id = UUID.randomUUID(); } }
 
-    public void setFuel(Fuel fuel) {
-        this.fuel = fuel;
-    }
-
-    public BigDecimal getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(BigDecimal capacity) {
-        this.capacity = capacity;
-    }
-
-    public String getIdentity() {
-        return identity;
-    }
-
-    public void setIdentity(String identity) {
-        this.identity = identity;
-    }
-
-    public BigDecimal getVolume() {
-        return volume;
-    }
-
-    public void setVolume(BigDecimal volume) {
-        this.volume = volume;
-    }
-
-    public LocalDateTime getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(LocalDateTime deleted) {
-        this.deleted = deleted;
-    }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
+    public UUID getStationId() { return stationId; }
+    public void setStationId(UUID stationId) { this.stationId = stationId; }
+    public String getCode() { return code; }
+    public void setCode(String code) { this.code = code; }
+    public UUID getProductId() { return productId; }
+    public void setProductId(UUID productId) { this.productId = productId; }
+    public BigDecimal getCapacityLiters() { return capacityLiters; }
+    public void setCapacityLiters(BigDecimal capacityLiters) { this.capacityLiters = capacityLiters; }
+    public BigDecimal getDeadStockLiters() { return deadStockLiters; }
+    public void setDeadStockLiters(BigDecimal deadStockLiters) { this.deadStockLiters = deadStockLiters; }
+    public BigDecimal getCurrentBookLiters() { return currentBookLiters; }
+    public void setCurrentBookLiters(BigDecimal currentBookLiters) { this.currentBookLiters = currentBookLiters; }
+    public Boolean getActive() { return active; }
+    public void setActive(Boolean active) { this.active = active; }
 }
