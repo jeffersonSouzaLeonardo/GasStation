@@ -80,8 +80,9 @@ public class UserService {
     }
 
     public UserResponseDTO find(UUID id) {
-        User user = userRepository.findByIdAndActiveTrue(id);
-        if (user == null) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundBusinessException(String.format("User with ID %s not found", id)));
+        if (!Boolean.TRUE.equals(user.getActive())) {
             throw new NotFoundBusinessException(String.format("User with ID %s not found", id));
         }
         return userMapper.userToUserResponseDTO(user);
@@ -106,8 +107,9 @@ public class UserService {
     }
 
     public User getUserEntityById(UUID id) {
-        User user = userRepository.findByIdAndActiveTrue(id);
-        if (user == null) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundBusinessException(String.format("User with ID %s not found", id)));
+        if (!Boolean.TRUE.equals(user.getActive())) {
             throw new NotFoundBusinessException(String.format("User with ID %s not found", id));
         }
         return user;
