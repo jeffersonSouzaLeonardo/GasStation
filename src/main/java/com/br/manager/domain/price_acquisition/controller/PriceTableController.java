@@ -54,7 +54,7 @@ public class PriceTableController {
     }
 
     @Valid
-    @PutMapping
+    @PatchMapping
     public ResponseEntity<PriceTableResponseDTO> update(@RequestBody PriceTableInputDTO inputDTO) {
         return ResponseEntity.ok(priceTableService.update(inputDTO));
     }

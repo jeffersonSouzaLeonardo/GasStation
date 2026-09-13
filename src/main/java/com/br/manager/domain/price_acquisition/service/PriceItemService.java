@@ -8,6 +8,8 @@ import com.br.manager.domain.price_acquisition.entity.PriceItem;
 import com.br.manager.domain.price_acquisition.entity.PriceTable;
 import com.br.manager.domain.price_acquisition.mapper.PriceItemMapper;
 import com.br.manager.domain.price_acquisition.repository.PriceItemRepository;
+import com.br.manager.domain.price_acquisition.repository.PriceTableRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class PriceItemService {
 
     @Autowired
@@ -25,11 +28,50 @@ public class PriceItemService {
     private PriceItemMapper priceItemMapper;
 
     @Autowired
-    private PriceTableService priceTableService;
+    private PriceTableRepository priceTableRepository;
+
+    public List<PriceItemResponseDTO> replaceByPriceTable(UUID priceTableId, List<PriceItemInputDTO> inputDTOs) {
+        try {
+            PriceTable priceTable = priceTableRepository.findById(priceTableId)
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Price table with ID %s not found", priceTableId)));
+
+            List<PriceItem> currentItems = priceItemRepository.findByPriceTableIdAndActiveTrue(priceTableId);
+            currentItems.forEach(item -> item.setActive(false));
+            priceItemRepository.saveAllAndFlush(currentItems);
+
+            if (inputDTOs == null || inputDTOs.isEmpty()) {
+                return List.of();
+            }
+
+            List<PriceItem> priceItems = inputDTOs.stream()
+                    .map(dto -> {
+                        PriceItem entity = priceItemMapper.priceItemInputDTOToPriceItem(dto);
+                        if (entity.getId() == null) {
+                            entity.setId(UUID.randomUUID());
+                        }
+                        entity.setPriceTable(priceTable);
+                        entity.setActive(dto.getActive() != null ? dto.getActive() : true);
+                        return entity;
+                    })
+                    .toList();
+
+            return priceItemMapper.listPriceItemToListPriceItemResponseDTO(priceItemRepository.saveAllAndFlush(priceItems));
+        } catch (ConstraintViolationException exception) {
+            throw new BusinessException(exception.getConstraintViolations().stream()
+                    .map(v -> v.getMessage())
+                    .toList()
+                    .toString());
+        } catch (NotFoundBusinessException exception) {
+            throw exception;
+        } catch (Exception e) {
+            throw new BusinessException("Error while replacing price items for price table " + priceTableId, e);
+        }
+    }
 
     public List<PriceItemResponseDTO> saveAllByPriceTable(UUID priceTableId, List<PriceItemInputDTO> inputDTOs) {
         try {
-            PriceTable priceTable = priceTableService.getPriceTableEntityById(priceTableId);
+            PriceTable priceTable = priceTableRepository.findById(priceTableId)
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Price table with ID %s not found", priceTableId)));
             List<PriceItem> priceItems = inputDTOs == null ? List.of() : inputDTOs.stream()
                     .map(dto -> {
                         PriceItem entity = priceItemMapper.priceItemInputDTOToPriceItem(dto);
@@ -54,6 +96,26 @@ public class PriceItemService {
         }
     }
 
+
+    public PriceItemResponseDTO savePriceItem(PriceItemInputDTO inputDTO) {
+        try {
+            PriceTable priceTable = priceTableRepository.findById(inputDTO.getPriceTableId())
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Price table with ID %s not found", inputDTO.getPriceTableId())));
+            PriceItem entity = priceItemMapper.priceItemInputDTOToPriceItem(inputDTO);
+            entity.setPriceTable(priceTable);
+            return priceItemMapper.priceItemToPriceItemResponseDTO(priceItemRepository.saveAndFlush(entity));
+        } catch (ConstraintViolationException exception) {
+            throw new BusinessException(exception.getConstraintViolations().stream()
+                    .map(v -> v.getMessage())
+                    .toList()
+                    .toString());
+        } catch (NotFoundBusinessException exception) {
+            throw exception;
+        } catch (Exception e) {
+            throw new BusinessException("Error while saving price items for price table " + inputDTO.getPriceTableId(), e);
+        }
+    }
+
     public List<PriceItemResponseDTO> savePriceItems(UUID priceTableId, List<PriceItemInputDTO> inputDTOs) {
         return saveAllByPriceTable(priceTableId, inputDTOs);
     }
@@ -66,7 +128,8 @@ public class PriceItemService {
             }
             priceItemMapper.updatePriceItemFromDto(inputDTO, entity);
             if (inputDTO.getPriceTableId() != null) {
-                PriceTable priceTable = priceTableService.getPriceTableEntityById(inputDTO.getPriceTableId());
+                PriceTable priceTable = priceTableRepository.findById(inputDTO.getPriceTableId())
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Price table with ID %s not found", inputDTO.getPriceTableId())));
                 entity.setPriceTable(priceTable);
             }
             return priceItemMapper.priceItemToPriceItemResponseDTO(priceItemRepository.saveAndFlush(entity));
@@ -87,14 +150,10 @@ public class PriceItemService {
     }
 
     public void delete(UUID id) {
-        deleteLogical(id);
-    }
-
-    public void deleteLogical(UUID id) {
         try {
-            PriceItem entity = priceItemRepository.findById(id)
+            PriceItem priceItem = priceItemRepository.findById(id)
                     .orElseThrow(() -> new NotFoundBusinessException(String.format("Price item with ID %s not found", id)));
-            priceItemRepository.saveAndFlush(entity);
+            priceItemRepository.delete(priceItem);
         } catch (ConstraintViolationException exception) {
             throw new BusinessException(exception.getConstraintViolations().stream()
                     .map(v -> v.getMessage())

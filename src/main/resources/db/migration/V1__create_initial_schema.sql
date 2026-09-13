@@ -282,7 +282,6 @@ CREATE TABLE purchase_orders (
                                  status VARCHAR(30) NOT NULL,
                                  ordered_at DATETIME,
                                  expected_at DATETIME,
-                                 total_amount DECIMAL(15, 2) DEFAULT 0,
                                  created_by VARCHAR(36) NOT NULL,
 
     -- Transversais
@@ -306,7 +305,6 @@ CREATE TABLE purchase_order_items (
                                       product_id VARCHAR(36) NOT NULL,
                                       quantity DECIMAL(15, 4) NOT NULL,
                                       unit_cost DECIMAL(15, 4) NOT NULL,
-                                      total_cost DECIMAL(15, 2) NOT NULL,
 
                                       CONSTRAINT fk_poi_order FOREIGN KEY (purchase_order_id) REFERENCES purchase_orders(id),
                                       CONSTRAINT fk_poi_product FOREIGN KEY (product_id) REFERENCES products(id)

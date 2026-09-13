@@ -114,4 +114,12 @@ public class PriceItem {
     public void setMaxDiscountPercent(BigDecimal maxDiscountPercent) {
         this.maxDiscountPercent = maxDiscountPercent;
     }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
 }

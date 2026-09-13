@@ -35,6 +35,9 @@ public class PriceTableService {
     PriceItemMapper priceItemMapper;
 
     @Autowired
+    PriceItemService priceItemService;
+
+    @Autowired
     UserRepository userRepository;
 
     @Autowired
@@ -50,10 +53,6 @@ public class PriceTableService {
         try {
             PriceTable priceTable = priceTableMapper.priceTableInputDTOToPriceTable(inputDTO);
             priceTable.setId(null);
-            priceTable.setPriceItems(priceItemMapper.listPriceItemInputDTOToListPriceItem(inputDTO.getPriceItems()));
-            for (PriceItem item : priceTable.getPriceItems()) {
-                item.setPriceTable(priceTable);
-            }
 
            User createdBy = userRepository.findById(inputDTO.getCreatedBy())
                    .orElseThrow(() -> new NotFoundBusinessException(String.format("User with ID %s not found", inputDTO.getCreatedBy())));
@@ -62,14 +61,19 @@ public class PriceTableService {
            }
            priceTable.setCreatedBy(createdBy);
 
-            Station station = stationRepository.findById(inputDTO.getStationId())
+           Station station = stationRepository.findById(inputDTO.getStationId())
                     .orElseThrow(() -> new NotFoundBusinessException(String.format("Station with ID %s not found", inputDTO.getStationId())));
               if (!Boolean.TRUE.equals(station.getActive())) {
                   throw new NotFoundBusinessException(String.format("Station with ID %s not found", inputDTO.getStationId()));
               }
-            priceTable.setStation(station);
+           priceTable.setStation(station);
+
            PriceTable savedPriceTable = priceTableRepository.saveAndFlush(priceTable);
-           return priceTableMapper.priceTableToPriceTableResponseDTO(savedPriceTable);
+           priceItemService.savePriceItems(savedPriceTable.getId(), inputDTO.getPriceItems());
+
+           PriceTableResponseDTO response = priceTableMapper.priceTableToPriceTableResponseDTO(savedPriceTable);
+           response.setPriceItems(priceItemService.findByPriceTable(savedPriceTable.getId()));
+           return response;
         } catch (ConstraintViolationException exception) {
            throw new BusinessException(exception.getConstraintViolations().stream()
                    .map(v -> v.getMessage())
@@ -87,8 +91,35 @@ public class PriceTableService {
         try {
             PriceTable priceTable = priceTableRepository.findById(inputDTO.getId())
                     .orElseThrow(() -> new NotFoundBusinessException(String.format("Price Table with ID %s not found", inputDTO.getId())));
+
+            if (inputDTO.getStationId() != null) {
+                Station station = stationRepository.findById(inputDTO.getStationId())
+                        .orElseThrow(() -> new NotFoundBusinessException(String.format("Station with ID %s not found", inputDTO.getStationId())));
+                if (!Boolean.TRUE.equals(station.getActive())) {
+                    throw new NotFoundBusinessException(String.format("Station with ID %s not found", inputDTO.getStationId()));
+                }
+                priceTable.setStation(station);
+            }
+
+            if (inputDTO.getCreatedBy() != null) {
+                User createdBy = userRepository.findById(inputDTO.getCreatedBy())
+                        .orElseThrow(() -> new NotFoundBusinessException(String.format("User with ID %s not found", inputDTO.getCreatedBy())));
+                if (!Boolean.TRUE.equals(createdBy.getActive())) {
+                    throw new NotFoundBusinessException(String.format("User with ID %s not found", inputDTO.getCreatedBy()));
+                }
+                priceTable.setCreatedBy(createdBy);
+            }
+
             priceTableMapper.updatePriceTableFromDto(inputDTO, priceTable);
-            return priceTableMapper.priceTableToPriceTableResponseDTO(priceTableRepository.saveAndFlush(priceTable));
+            PriceTable savedPriceTable = priceTableRepository.saveAndFlush(priceTable);
+
+            if (inputDTO.getPriceItems() != null) {
+                priceItemService.replaceByPriceTable(savedPriceTable.getId(), inputDTO.getPriceItems());
+            }
+
+            PriceTableResponseDTO response = priceTableMapper.priceTableToPriceTableResponseDTO(savedPriceTable);
+            response.setPriceItems(priceItemService.findByPriceTable(savedPriceTable.getId()));
+            return response;
         } catch (ConstraintViolationException exception) {
             throw new BusinessException(exception.getConstraintViolations().stream()
                     .map(v -> v.getMessage())
