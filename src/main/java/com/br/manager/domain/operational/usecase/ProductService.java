@@ -5,8 +5,10 @@ import com.br.manager.domain.common.exception.NotFoundBusinessException;
 import com.br.manager.domain.operational.dto.ProductInputDTO;
 import com.br.manager.domain.operational.dto.ProductResponseDTO;
 import com.br.manager.domain.operational.entity.Product;
+import com.br.manager.domain.operational.enums.ProductTypeEnum;
 import com.br.manager.domain.operational.mapper.ProductMapper;
 import com.br.manager.domain.operational.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class ProductService {
 
     @Autowired
@@ -27,9 +30,6 @@ public class ProductService {
     public ProductResponseDTO create(ProductInputDTO inputDTO) {
         try {
             Product product = productMapper.productInputDTOToProduct(inputDTO);
-            if (product.getId() == null) {
-                product.setId(UUID.randomUUID());
-            }
             return productMapper.productToProductResponseDTO(productRepository.saveAndFlush(product));
         } catch (ConstraintViolationException exception) {
             throw new BusinessException(exception.getConstraintViolations().stream()
@@ -38,7 +38,7 @@ public class ProductService {
                     .toString());
         } catch (Exception e) {
             String productName = inputDTO != null && StringUtils.hasText(inputDTO.getName()) ? inputDTO.getName() : "";
-            throw new BusinessException("Error while saving product " + productName, e);
+            throw new BusinessException("Erro ao salvar produto " + productName, e);
         }
     }
 
@@ -46,7 +46,7 @@ public class ProductService {
         try {
             Product product = productRepository.findByIdAndActiveTrue(inputDTO.getId());
             if (product == null) {
-                throw new NotFoundBusinessException(String.format("Product with ID %s not found", inputDTO.getId()));
+                throw new NotFoundBusinessException(String.format("Produto com ID %s não encontrado", inputDTO.getId()));
             }
             productMapper.updateProductFromDto(inputDTO, product);
             return productMapper.productToProductResponseDTO(productRepository.saveAndFlush(product));
@@ -59,13 +59,18 @@ public class ProductService {
             throw exception;
         } catch (Exception e) {
             String productName = inputDTO != null && StringUtils.hasText(inputDTO.getName()) ? inputDTO.getName() : "";
-            throw new BusinessException("Error while saving product " + productName, e);
+            throw new BusinessException("Erro ao salvar produto " + productName, e);
         }
     }
 
     public List<ProductResponseDTO> findAll() {
         return productMapper.listProductToListProductResponseDTO(productRepository.findAllByActiveTrue());
     }
+
+    public List<ProductResponseDTO> findProductTypeFuel() {
+        return productMapper.listProductToListProductResponseDTO(productRepository.findByProductTypeAndActiveTrue(ProductTypeEnum.FUEL));
+    }
+
 
     public List<ProductResponseDTO> findByDescription(String description) {
         if (!StringUtils.hasText(description)) {
@@ -78,7 +83,7 @@ public class ProductService {
     public ProductResponseDTO find(UUID id) {
         Product product = productRepository.findByIdAndActiveTrue(id);
         if (product == null) {
-            throw new NotFoundBusinessException(String.format("Product with ID %s not found", id));
+            throw new NotFoundBusinessException(String.format("Produto com ID %s não encontrado", id));
         }
         return productMapper.productToProductResponseDTO(product);
     }
@@ -86,7 +91,7 @@ public class ProductService {
     public void delete(UUID id) {
         try {
             Product product = productRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Product with ID %s not found", id)));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Produto com ID %s não encontrado", id)));
             product.setActive(false);
             productRepository.saveAndFlush(product);
         } catch (ConstraintViolationException exception) {
@@ -97,14 +102,14 @@ public class ProductService {
         } catch (NotFoundBusinessException exception) {
             throw exception;
         } catch (Exception e) {
-            throw new BusinessException("Error while deleting product", e);
+            throw new BusinessException("Erro ao excluir produto", e);
         }
     }
 
     public Product getProductEntityById(UUID id) {
         Product product = productRepository.findByIdAndActiveTrue(id);
         if (product == null) {
-            throw new NotFoundBusinessException(String.format("Product with ID %s not found", id));
+            throw new NotFoundBusinessException(String.format("Produto com ID %s não encontrado", id));
         }
         return product;
     }

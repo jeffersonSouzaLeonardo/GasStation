@@ -9,12 +9,12 @@ import org.mapstruct.MappingTarget;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface StationProductMapper {
-    StationProduct stationProductInputDTOToStationProduct(StationProductInputDTO inputDTO);
+public abstract class StationProductMapper {
+    public abstract StationProduct stationProductInputDTOToStationProduct(StationProductInputDTO inputDTO);
 
-    StationProductResponseDTO stationProductToStationProductResponseDTO(StationProduct entity);
+    public abstract StationProductResponseDTO stationProductToStationProductResponseDTO(StationProduct entity);
 
-    List<StationProductResponseDTO> listStationProductToListStationProductResponseDTO(List<StationProduct> entities);
+    public abstract List<StationProductResponseDTO> listStationProductToListStationProductResponseDTO(List<StationProduct> entities);
 
-    void updateStationProductFromDto(StationProductInputDTO dto, @MappingTarget StationProduct entity);
+    public abstract void updateStationProductFromDto(StationProductInputDTO dto, @MappingTarget StationProduct entity);
 }

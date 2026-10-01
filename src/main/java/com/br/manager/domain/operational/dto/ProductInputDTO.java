@@ -7,7 +7,6 @@ import java.util.UUID;
 
 public class ProductInputDTO {
     private UUID id;
-    private UUID companyId;
     private String sku;
     private String name;
     private ProductTypeEnum productType;
@@ -19,8 +18,6 @@ public class ProductInputDTO {
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
-    public UUID getCompanyId() { return companyId; }
-    public void setCompanyId(UUID companyId) { this.companyId = companyId; }
     public String getSku() { return sku; }
     public void setSku(String sku) { this.sku = sku; }
     public String getName() { return name; }

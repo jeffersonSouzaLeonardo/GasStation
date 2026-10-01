@@ -6,7 +6,6 @@ import java.util.UUID;
 
 public class PriceTableInputDTO {
     private UUID id;
-    private UUID stationId;
     private String name;
     private LocalDateTime validFrom;
     private LocalDateTime validTo;
@@ -22,13 +21,6 @@ public class PriceTableInputDTO {
         this.id = id;
     }
 
-    public UUID getStationId() {
-        return stationId;
-    }
-
-    public void setStationId(UUID stationId) {
-        this.stationId = stationId;
-    }
 
     public String getName() {
         return name;

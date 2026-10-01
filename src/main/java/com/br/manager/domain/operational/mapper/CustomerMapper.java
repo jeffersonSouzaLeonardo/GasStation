@@ -9,12 +9,12 @@ import org.mapstruct.MappingTarget;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface CustomerMapper {
-    Customer customerInputDTOToCustomer(CustomerInputDTO inputDTO);
+public abstract class CustomerMapper {
+    public abstract Customer customerInputDTOToCustomer(CustomerInputDTO inputDTO);
 
-    CustomerResponseDTO customerToCustomerResponseDTO(Customer entity);
+    public abstract CustomerResponseDTO customerToCustomerResponseDTO(Customer entity);
 
-    List<CustomerResponseDTO> listCustomerToListCustomerResponseDTO(List<Customer> entities);
+    public abstract List<CustomerResponseDTO> listCustomerToListCustomerResponseDTO(List<Customer> entities);
 
-    void updateCustomerFromDto(CustomerInputDTO dto, @MappingTarget Customer entity);
+    public abstract void updateCustomerFromDto(CustomerInputDTO dto, @MappingTarget Customer entity);
 }

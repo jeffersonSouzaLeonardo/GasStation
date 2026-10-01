@@ -19,23 +19,23 @@ public class UserLink {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @NotNull(message = "User ID is required.")
+    @NotNull(message = "O ID do usuário é obrigatório.")
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
-    @NotNull(message = "Company ID is required.")
+    @NotNull(message = "O ID da empresa é obrigatório.")
     @Column(name = "company_id", nullable = false)
     private UUID companyId;
 
     @Column(name = "station_id")
     private UUID stationId;
 
-    @NotNull(message = "Role is required.")
+    @NotNull(message = "O papel é obrigatório.")
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private RoleTypeEnum role;
 
-    @NotNull(message = "Active flag is required.")
+    @NotNull(message = "O campo ativo é obrigatório.")
     @Column(name = "active", nullable = false)
     private Boolean active = true;
 

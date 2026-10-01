@@ -17,14 +17,14 @@ public class Company {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @NotBlank(message = "Legal name is required.")
+    @NotBlank(message = "A razão social é obrigatória.")
     @Column(name = "legal_name", nullable = false)
     private String legalName;
 
     @Column(name = "trade_name")
     private String tradeName;
 
-    @NotBlank(message = "CNPJ is required.")
+    @NotBlank(message = "O CNPJ é obrigatório.")
     @Column(name = "cnpj", nullable = false, unique = true, length = 14)
     private String cnpj;
 
@@ -40,7 +40,7 @@ public class Company {
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @NotNull(message = "Active flag is required.")
+    @NotNull(message = "O campo ativo é obrigatório.")
     @Column(name = "active", nullable = false)
     private Boolean active = true;
 

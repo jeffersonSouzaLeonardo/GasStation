@@ -15,5 +15,4 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
     List<Customer> findByNameContainingIgnoreCaseAndActiveTrue(String name);
 
-    List<Customer> findByCompanyIdAndActiveTrue(UUID companyId);
 }

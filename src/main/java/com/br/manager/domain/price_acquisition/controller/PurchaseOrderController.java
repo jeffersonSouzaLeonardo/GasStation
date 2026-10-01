@@ -34,11 +34,6 @@ public class PurchaseOrderController {
         return ResponseEntity.ok(purchaseOrderService.findById(id));
     }
 
-    @GetMapping("/station/{stationId}")
-    public ResponseEntity<List<PurchaseOrderResponseDTO>> findByStation(@PathVariable UUID stationId) {
-        return ResponseEntity.ok(purchaseOrderService.findByStation(stationId));
-    }
-
     @PatchMapping()
     public ResponseEntity<PurchaseOrderResponseDTO> update(@Valid @RequestBody PurchaseOrderInputDTO inputDTO) {
         return ResponseEntity.ok(purchaseOrderService.update(inputDTO));

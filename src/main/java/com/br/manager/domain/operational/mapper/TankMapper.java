@@ -18,7 +18,6 @@ public class TankMapper {
 
         Tank tank = new Tank();
         tank.setId(inputDTO.getId());
-        tank.setStationId(inputDTO.getStationId());
         tank.setCode(inputDTO.getCode());
         tank.setProductId(inputDTO.getProductId());
         tank.setCapacityLiters(inputDTO.getCapacityLiters());
@@ -35,7 +34,6 @@ public class TankMapper {
 
         TankResponseDTO responseDTO = new TankResponseDTO();
         responseDTO.setId(tank.getId());
-        responseDTO.setStationId(tank.getStationId());
         responseDTO.setCode(tank.getCode());
         responseDTO.setProductId(tank.getProductId());
         responseDTO.setCapacityLiters(tank.getCapacityLiters());
@@ -50,7 +48,6 @@ public class TankMapper {
             return;
         }
 
-        if (inputDTO.getStationId() != null) { entity.setStationId(inputDTO.getStationId()); }
         if (inputDTO.getCode() != null) { entity.setCode(inputDTO.getCode()); }
         if (inputDTO.getProductId() != null) { entity.setProductId(inputDTO.getProductId()); }
         if (inputDTO.getCapacityLiters() != null) { entity.setCapacityLiters(inputDTO.getCapacityLiters()); }

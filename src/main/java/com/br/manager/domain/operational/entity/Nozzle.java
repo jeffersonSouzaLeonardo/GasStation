@@ -1,10 +1,6 @@
 package com.br.manager.domain.operational.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -17,6 +13,7 @@ import java.util.UUID;
 public class Nozzle {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
@@ -43,11 +40,7 @@ public class Nozzle {
     @NotNull(message = "Active flag is required.")
     @Column(name = "active", nullable = false)
     private Boolean active = true;
-
-    @PrePersist
-    public void ensureId() { if (this.id == null) { this.id = UUID.randomUUID(); } }
-
-    public UUID getId() { return id; }
+public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
     public UUID getPumpId() { return pumpId; }
     public void setPumpId(UUID pumpId) { this.pumpId = pumpId; }

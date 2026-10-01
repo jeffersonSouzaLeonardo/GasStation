@@ -1,6 +1,7 @@
 package com.br.manager.domain.operational.repository;
 
 import com.br.manager.domain.operational.entity.Product;
+import com.br.manager.domain.operational.enums.ProductTypeEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,9 +14,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     Product findByIdAndActiveTrue(UUID id);
 
+    List<Product> findByProductTypeAndActiveTrue(ProductTypeEnum type);
+
     List<Product> findByNameContainingIgnoreCaseAndActiveTrue(String name);
 
-    List<Product> findBySkuContainingIgnoreCaseAndActiveTrue(String sku);
-
-    List<Product> findByCompanyIdAndActiveTrue(UUID companyId);
 }

@@ -1,6 +1,5 @@
 package com.br.manager.domain.price_acquisition.mapper;
 
-import com.br.manager.domain.organization.entity.Station;
 import com.br.manager.domain.organization.entity.User;
 import com.br.manager.domain.price_acquisition.dto.PriceItemResponseDTO;
 import com.br.manager.domain.price_acquisition.dto.PriceTableInputDTO;
@@ -34,11 +33,6 @@ public class PriceTableMapper {
             entity.setCreatedBy(user);
         }
 
-        if (inputDTO.getStationId() != null) {
-            Station station = new Station();
-            station.setId(inputDTO.getStationId());
-            entity.setStation(station);
-        }
 
         return entity;
     }
@@ -50,7 +44,6 @@ public class PriceTableMapper {
 
         PriceTableResponseDTO dto = new PriceTableResponseDTO();
         dto.setId(priceTable.getId());
-        dto.setStationId(priceTable.getStation() != null ? priceTable.getStation().getId() : null);
         dto.setName(priceTable.getName());
         dto.setValidFrom(priceTable.getValidFrom() != null ? priceTable.getValidFrom().toString() : null);
         dto.setValidTo(priceTable.getValidTo() != null ? priceTable.getValidTo().toString() : null);

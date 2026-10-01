@@ -50,7 +50,7 @@ public class FuelService {
             Fuel fuel = fuelRepository.findByIdAndDeletedIsNull(inputDTO.getId());
 
             if (fuel == null) {
-                throw new NotFoundBusinessException(String.format("ID %s não encontrado", inputDTO.getId()));
+                throw new NotFoundBusinessException(String.format("Combustível com ID %s não encontrado", inputDTO.getId()));
             }
 
             fuelMapper.updateFuelFromDto(inputDTO, fuel);
@@ -93,7 +93,7 @@ public class FuelService {
         Fuel fuel  = fuelRepository.findByIdAndDeletedIsNull(id);
 
          if (fuel == null) {
-            throw new NotFoundBusinessException(String.format("ID %s não encontrado", id));
+            throw new NotFoundBusinessException(String.format("Combustível com ID %s não encontrado", id));
         }
 
          return fuelMapper.fuelEntityToFuelResponseDTO(fuel);
@@ -103,7 +103,7 @@ public class FuelService {
         try {
 
             Fuel fuel = fuelRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("ID %s não encontrado", id)));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Combustível com ID %s não encontrado", id)));
 
             fuel.setDeleted(LocalDateTime.now());
             fuelRepository.saveAndFlush(fuel);

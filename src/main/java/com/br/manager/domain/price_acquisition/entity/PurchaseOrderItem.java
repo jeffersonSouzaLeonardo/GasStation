@@ -13,8 +13,8 @@ import java.util.UUID;
 public class PurchaseOrderItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @NotNull(message = "Purchase order is required.")

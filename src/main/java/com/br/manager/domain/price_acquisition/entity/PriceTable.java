@@ -1,6 +1,5 @@
 package com.br.manager.domain.price_acquisition.entity;
 
-import com.br.manager.domain.organization.entity.Station;
 import com.br.manager.domain.organization.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -19,28 +18,24 @@ public class PriceTable {
     @Column(name = "id", updatable = false)
     private UUID id;
 
-    @NotNull(message = "Station ID is required.")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "station_id", nullable = false)
-    private Station station;
 
-    @NotBlank(message = "Name is required.")
-    @Column(name = "name")
+    @NotBlank(message = "O nome é obrigatório.")
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @NotNull(message = "validade is required.")
+    @NotNull(message = "A data de início de validade é obrigatória.")
     @Column(name = "valid_from", nullable = false)
     private LocalDateTime validFrom;
 
-    @NotNull(message = "validade is required.")
+    @NotNull(message = "A data de fim de validade é obrigatória.")
     @Column(name = "valid_to", nullable = false)
     private LocalDateTime validTo;
 
-    @NotBlank(message = "status is required.")
+    @NotBlank(message = "O status é obrigatório.")
     @Column(name = "status", length = 20)
     private String status;
 
-    @NotNull(message = "createdBy is required.")
+    @NotNull(message = "O usuário de criação é obrigatório.")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
@@ -56,13 +51,6 @@ public class PriceTable {
         this.id = id;
     }
 
-    public Station getStation() {
-        return station;
-    }
-
-    public void setStation(Station station) {
-        this.station = station;
-    }
 
     public String getName() {
         return name;

@@ -15,5 +15,4 @@ public interface CustomerVehicleRepository extends JpaRepository<CustomerVehicle
 
     List<CustomerVehicle> findByPlateContainingIgnoreCaseAndActiveTrue(String plate);
 
-    List<CustomerVehicle> findByCustomerIdAndActiveTrue(UUID customerId);
 }

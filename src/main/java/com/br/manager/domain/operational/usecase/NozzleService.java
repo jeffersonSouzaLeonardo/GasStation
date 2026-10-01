@@ -9,6 +9,7 @@ import com.br.manager.domain.operational.entity.Product;
 import com.br.manager.domain.operational.enums.ProductTypeEnum;
 import com.br.manager.domain.operational.mapper.NozzleMapper;
 import com.br.manager.domain.operational.repository.NozzleRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class NozzleService {
 
     @Autowired
@@ -33,12 +35,11 @@ public class NozzleService {
         try {
             Product product = productService.getProductEntityById(inputDTO.getProductId());
             if (product.getProductType() != ProductTypeEnum.FUEL) {
-                throw new BusinessException("Only FUEL products can be sold by nozzle.");
+                throw new BusinessException("Apenas produtos do tipo COMBUSTÍVEL podem ser vendidos pela bomba.");
             }
             Nozzle entity = nozzleMapper.nozzleInputDTOToNozzle(inputDTO);
             if (entity.getId() == null) {
-                entity.setId(UUID.randomUUID());
-            }
+                            }
             return nozzleMapper.nozzleToNozzleResponseDTO(nozzleRepository.saveAndFlush(entity));
         } catch (ConstraintViolationException exception) {
             throw new BusinessException(exception.getConstraintViolations().stream()
@@ -49,7 +50,7 @@ public class NozzleService {
             throw exception;
         } catch (Exception e) {
             String nozzleCode = inputDTO != null && StringUtils.hasText(inputDTO.getCode()) ? inputDTO.getCode() : "";
-            throw new BusinessException("Error while saving nozzle " + nozzleCode, e);
+            throw new BusinessException("Erro ao salvar bomba " + nozzleCode, e);
         }
     }
 
@@ -57,11 +58,11 @@ public class NozzleService {
         try {
             Nozzle entity = nozzleRepository.findByIdAndActiveTrue(inputDTO.getId());
             if (entity == null) {
-                throw new NotFoundBusinessException(String.format("Nozzle with ID %s not found", inputDTO.getId()));
+                throw new NotFoundBusinessException(String.format("Bomba com ID %s não encontrada", inputDTO.getId()));
             }
             Product product = productService.getProductEntityById(inputDTO.getProductId());
             if (product.getProductType() != ProductTypeEnum.FUEL) {
-                throw new BusinessException("Only FUEL products can be sold by nozzle.");
+                throw new BusinessException("Apenas produtos do tipo COMBUSTÍVEL podem ser vendidos pela bomba.");
             }
             nozzleMapper.updateNozzleFromDto(inputDTO, entity);
             return nozzleMapper.nozzleToNozzleResponseDTO(nozzleRepository.saveAndFlush(entity));
@@ -76,7 +77,7 @@ public class NozzleService {
             throw exception;
         } catch (Exception e) {
             String nozzleCode = inputDTO != null && StringUtils.hasText(inputDTO.getCode()) ? inputDTO.getCode() : "";
-            throw new BusinessException("Error while saving nozzle " + nozzleCode, e);
+            throw new BusinessException("Erro ao salvar bomba " + nozzleCode, e);
         }
     }
 
@@ -94,7 +95,7 @@ public class NozzleService {
     public NozzleResponseDTO find(UUID id) {
         Nozzle entity = nozzleRepository.findByIdAndActiveTrue(id);
         if (entity == null) {
-            throw new NotFoundBusinessException(String.format("Nozzle with ID %s not found", id));
+            throw new NotFoundBusinessException(String.format("Bomba com ID %s não encontrada", id));
         }
         return nozzleMapper.nozzleToNozzleResponseDTO(entity);
     }
@@ -102,7 +103,7 @@ public class NozzleService {
     public void delete(UUID id) {
         try {
             Nozzle entity = nozzleRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Nozzle with ID %s not found", id)));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Bomba com ID %s não encontrada", id)));
             entity.setActive(false);
             nozzleRepository.saveAndFlush(entity);
         } catch (ConstraintViolationException exception) {
@@ -113,14 +114,14 @@ public class NozzleService {
         } catch (NotFoundBusinessException exception) {
             throw exception;
         } catch (Exception e) {
-            throw new BusinessException("Error while deleting nozzle", e);
+            throw new BusinessException("Erro ao excluir bomba", e);
         }
     }
 
     public Nozzle getNozzleEntityById(UUID id) {
         Nozzle entity = nozzleRepository.findByIdAndActiveTrue(id);
         if (entity == null) {
-            throw new NotFoundBusinessException(String.format("Nozzle with ID %s not found", id));
+            throw new NotFoundBusinessException(String.format("Bomba com ID %s não encontrada", id));
         }
         return entity;
     }

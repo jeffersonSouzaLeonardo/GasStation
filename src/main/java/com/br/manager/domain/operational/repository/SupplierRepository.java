@@ -15,5 +15,4 @@ public interface SupplierRepository extends JpaRepository<Supplier, UUID> {
 
     List<Supplier> findByLegalNameContainingIgnoreCaseAndActiveTrue(String legalName);
 
-    List<Supplier> findByCompanyIdAndActiveTrue(UUID companyId);
 }

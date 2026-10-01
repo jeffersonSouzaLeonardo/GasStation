@@ -9,13 +9,12 @@ import org.mapstruct.MappingTarget;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface AuditMapper {
+public abstract class AuditMapper {
+    public abstract Audit auditInputDTOToAudit(AuditInputDTO inputDTO);
 
-    Audit auditInputDTOToAudit(AuditInputDTO inputDTO);
+    public abstract AuditResponseDTO auditToAuditResponseDTO(Audit audit);
 
-    AuditResponseDTO auditToAuditResponseDTO(Audit audit);
+    public abstract List<AuditResponseDTO> listAuditToListAuditResponseDTO(List<Audit> audits);
 
-    List<AuditResponseDTO> listAuditToListAuditResponseDTO(List<Audit> audits);
-
-    void updateAuditFromDto(AuditInputDTO dto, @MappingTarget Audit entity);
+    public abstract void updateAuditFromDto(AuditInputDTO dto, @MappingTarget Audit entity);
 }

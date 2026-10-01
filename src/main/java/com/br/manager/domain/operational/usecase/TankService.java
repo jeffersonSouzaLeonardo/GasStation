@@ -9,6 +9,7 @@ import com.br.manager.domain.operational.entity.Tank;
 import com.br.manager.domain.operational.enums.ProductTypeEnum;
 import com.br.manager.domain.operational.mapper.TankMapper;
 import com.br.manager.domain.operational.repository.TankRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class TankService {
 
     @Autowired
@@ -33,12 +35,9 @@ public class TankService {
         try {
             Product product = productService.getProductEntityById(inputDTO.getProductId());
             if (product.getProductType() != ProductTypeEnum.FUEL) {
-                throw new BusinessException("Only FUEL products can be assigned to a tank.");
+                throw new BusinessException("Apenas produtos do tipo COMBUSTÍVEL podem ser atribuídos a um tanque.");
             }
             Tank tank = tankMapper.tankInputToTankEntity(inputDTO);
-            if (tank.getId() == null) {
-                tank.setId(UUID.randomUUID());
-            }
             return tankMapper.tankEntityToTankResponseDTO(tankRepository.saveAndFlush(tank));
         } catch (ConstraintViolationException exception) {
             throw new BusinessException(exception.getConstraintViolations().stream()
@@ -47,7 +46,7 @@ public class TankService {
                     .toString());
         } catch (Exception e) {
             String tankCode = inputDTO != null && StringUtils.hasText(inputDTO.getCode()) ? inputDTO.getCode() : "";
-            throw new BusinessException("Error while saving tank " + tankCode, e);
+            throw new BusinessException("Erro ao salvar tanque " + tankCode, e);
         }
     }
 
@@ -55,11 +54,11 @@ public class TankService {
         try {
             Tank tank = tankRepository.findByIdAndActiveTrue(inputDTO.getId());
             if (tank == null) {
-                throw new NotFoundBusinessException(String.format("Tank with ID %s not found", inputDTO.getId()));
+                throw new NotFoundBusinessException(String.format("Tanque com ID %s não encontrado", inputDTO.getId()));
             }
             Product product = productService.getProductEntityById(inputDTO.getProductId());
             if (product.getProductType() != ProductTypeEnum.FUEL) {
-                throw new BusinessException("Only FUEL products can be assigned to a tank.");
+                throw new BusinessException("Apenas produtos do tipo COMBUSTÍVEL podem ser atribuídos a um tanque.");
             }
             tankMapper.updateTankFromDto(inputDTO, tank);
             return tankMapper.tankEntityToTankResponseDTO(tankRepository.saveAndFlush(tank));
@@ -72,7 +71,7 @@ public class TankService {
             throw exception;
         } catch (Exception e) {
             String tankCode = inputDTO != null && StringUtils.hasText(inputDTO.getCode()) ? inputDTO.getCode() : "";
-            throw new BusinessException("Error while updating tank " + tankCode, e);
+            throw new BusinessException("Erro ao atualizar tanque " + tankCode, e);
         }
     }
 
@@ -91,7 +90,7 @@ public class TankService {
     public TankResponseDTO find(UUID id) {
         Tank tank = tankRepository.findByIdAndActiveTrue(id);
         if (tank == null) {
-            throw new NotFoundBusinessException(String.format("Tank with ID %s not found", id));
+            throw new NotFoundBusinessException(String.format("Tanque com ID %s não encontrado", id));
         }
         return tankMapper.tankEntityToTankResponseDTO(tank);
     }
@@ -99,7 +98,7 @@ public class TankService {
     public void delete(UUID id) {
         try {
             Tank tank = tankRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Tank with ID %s not found", id)));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Tanque com ID %s não encontrado", id)));
             tank.setActive(false);
             tankRepository.saveAndFlush(tank);
         } catch (ConstraintViolationException exception) {
@@ -110,14 +109,14 @@ public class TankService {
         } catch (NotFoundBusinessException exception) {
             throw exception;
         } catch (Exception e) {
-            throw new BusinessException("Error while deleting tank", e);
+            throw new BusinessException("Erro ao excluir tanque", e);
         }
     }
 
     public Tank getTankEntityById(UUID id) {
         Tank tank = tankRepository.findByIdAndActiveTrue(id);
         if (tank == null) {
-            throw new NotFoundBusinessException(String.format("Tank with ID %s not found", id));
+            throw new NotFoundBusinessException(String.format("Tanque com ID %s não encontrado", id));
         }
         return tank;
     }

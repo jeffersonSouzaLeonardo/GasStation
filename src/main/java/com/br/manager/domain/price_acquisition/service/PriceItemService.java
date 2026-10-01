@@ -30,14 +30,10 @@ public class PriceItemService {
     @Autowired
     private PriceTableRepository priceTableRepository;
 
-    public List<PriceItemResponseDTO> replaceByPriceTable(UUID priceTableId, List<PriceItemInputDTO> inputDTOs) {
+    public List<PriceItemResponseDTO> replaceByPriceTable(PriceTable priceTable, List<PriceItemInputDTO> inputDTOs) {
         try {
-            PriceTable priceTable = priceTableRepository.findById(priceTableId)
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Price table with ID %s not found", priceTableId)));
 
-            List<PriceItem> currentItems = priceItemRepository.findByPriceTableIdAndActiveTrue(priceTableId);
-            currentItems.forEach(item -> item.setActive(false));
-            priceItemRepository.saveAllAndFlush(currentItems);
+            priceItemRepository.deleteByPriceTable(priceTable);
 
             if (inputDTOs == null || inputDTOs.isEmpty()) {
                 return List.of();
@@ -46,8 +42,9 @@ public class PriceItemService {
             List<PriceItem> priceItems = inputDTOs.stream()
                     .map(dto -> {
                         PriceItem entity = priceItemMapper.priceItemInputDTOToPriceItem(dto);
-                        if (entity.getId() == null) {
-                            entity.setId(UUID.randomUUID());
+                        // If the client sent an id but rows were deleted above, clear the id so JPA will insert a new row
+                        if (entity.getId() != null) {
+                            entity.setId(null);
                         }
                         entity.setPriceTable(priceTable);
                         entity.setActive(dto.getActive() != null ? dto.getActive() : true);
@@ -64,20 +61,19 @@ public class PriceItemService {
         } catch (NotFoundBusinessException exception) {
             throw exception;
         } catch (Exception e) {
-            throw new BusinessException("Error while replacing price items for price table " + priceTableId, e);
+            throw new BusinessException("Erro ao substituir itens de preço da tabela " + priceTable.getName(), e);
         }
     }
 
     public List<PriceItemResponseDTO> saveAllByPriceTable(UUID priceTableId, List<PriceItemInputDTO> inputDTOs) {
         try {
             PriceTable priceTable = priceTableRepository.findById(priceTableId)
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Price table with ID %s not found", priceTableId)));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Tabela de preços com ID %s não encontrada", priceTableId)));
             List<PriceItem> priceItems = inputDTOs == null ? List.of() : inputDTOs.stream()
                     .map(dto -> {
                         PriceItem entity = priceItemMapper.priceItemInputDTOToPriceItem(dto);
                         if (entity.getId() == null) {
-                            entity.setId(UUID.randomUUID());
-                        }
+                                                    }
                         entity.setPriceTable(priceTable);
                         return entity;
                     })
@@ -92,7 +88,7 @@ public class PriceItemService {
         } catch (NotFoundBusinessException exception) {
             throw exception;
         } catch (Exception e) {
-            throw new BusinessException("Error while saving price items for price table " + priceTableId, e);
+            throw new BusinessException("Erro ao salvar itens de preço da tabela " + priceTableId, e);
         }
     }
 
@@ -100,7 +96,7 @@ public class PriceItemService {
     public PriceItemResponseDTO savePriceItem(PriceItemInputDTO inputDTO) {
         try {
             PriceTable priceTable = priceTableRepository.findById(inputDTO.getPriceTableId())
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Price table with ID %s not found", inputDTO.getPriceTableId())));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Tabela de preços com ID %s não encontrada", inputDTO.getPriceTableId())));
             PriceItem entity = priceItemMapper.priceItemInputDTOToPriceItem(inputDTO);
             entity.setPriceTable(priceTable);
             return priceItemMapper.priceItemToPriceItemResponseDTO(priceItemRepository.saveAndFlush(entity));
@@ -112,7 +108,7 @@ public class PriceItemService {
         } catch (NotFoundBusinessException exception) {
             throw exception;
         } catch (Exception e) {
-            throw new BusinessException("Error while saving price items for price table " + inputDTO.getPriceTableId(), e);
+            throw new BusinessException("Erro ao salvar itens de preço da tabela " + inputDTO.getPriceTableId(), e);
         }
     }
 
@@ -124,12 +120,12 @@ public class PriceItemService {
         try {
             PriceItem entity = priceItemRepository.findByIdAndActiveTrue(inputDTO.getId());
             if (entity == null) {
-                throw new NotFoundBusinessException(String.format("Price item with ID %s not found", inputDTO.getId()));
+                throw new NotFoundBusinessException(String.format("Item de preço com ID %s não encontrado", inputDTO.getId()));
             }
             priceItemMapper.updatePriceItemFromDto(inputDTO, entity);
             if (inputDTO.getPriceTableId() != null) {
                 PriceTable priceTable = priceTableRepository.findById(inputDTO.getPriceTableId())
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Price table with ID %s not found", inputDTO.getPriceTableId())));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Tabela de preços com ID %s não encontrada", inputDTO.getPriceTableId())));
                 entity.setPriceTable(priceTable);
             }
             return priceItemMapper.priceItemToPriceItemResponseDTO(priceItemRepository.saveAndFlush(entity));
@@ -141,18 +137,14 @@ public class PriceItemService {
         } catch (NotFoundBusinessException exception) {
             throw exception;
         } catch (Exception e) {
-            throw new BusinessException("Error while updating price item", e);
+            throw new BusinessException("Erro ao atualizar item de preço", e);
         }
-    }
-
-    public PriceItemResponseDTO edit(PriceItemInputDTO inputDTO) {
-        return update(inputDTO);
     }
 
     public void delete(UUID id) {
         try {
             PriceItem priceItem = priceItemRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Price item with ID %s not found", id)));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Item de preço com ID %s não encontrado", id)));
             priceItemRepository.delete(priceItem);
         } catch (ConstraintViolationException exception) {
             throw new BusinessException(exception.getConstraintViolations().stream()
@@ -162,7 +154,7 @@ public class PriceItemService {
         } catch (NotFoundBusinessException exception) {
             throw exception;
         } catch (Exception e) {
-            throw new BusinessException("Error while deleting price item", e);
+            throw new BusinessException("Erro ao excluir item de preço", e);
         }
     }
 
@@ -177,7 +169,7 @@ public class PriceItemService {
     public PriceItemResponseDTO find(UUID id) {
         PriceItem entity = priceItemRepository.findByIdAndActiveTrue(id);
         if (entity == null) {
-            throw new NotFoundBusinessException(String.format("Price item with ID %s not found", id));
+            throw new NotFoundBusinessException(String.format("Item de preço com ID %s não encontrado", id));
         }
         return priceItemMapper.priceItemToPriceItemResponseDTO(entity);
     }
@@ -189,9 +181,8 @@ public class PriceItemService {
     public PriceItem getPriceItemEntityById(UUID id) {
         PriceItem entity = priceItemRepository.findByIdAndActiveTrue(id);
         if (entity == null) {
-            throw new NotFoundBusinessException(String.format("Price item with ID %s not found", id));
+            throw new NotFoundBusinessException(String.format("Item de preço com ID %s não encontrado", id));
         }
         return entity;
     }
 }
-

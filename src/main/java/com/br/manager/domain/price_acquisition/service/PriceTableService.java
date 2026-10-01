@@ -2,9 +2,7 @@ package com.br.manager.domain.price_acquisition.service;
 
 import com.br.manager.domain.common.exception.BusinessException;
 import com.br.manager.domain.common.exception.NotFoundBusinessException;
-import com.br.manager.domain.organization.entity.Station;
 import com.br.manager.domain.organization.entity.User;
-import com.br.manager.domain.organization.repository.StationRepository;
 import com.br.manager.domain.organization.repository.UserRepository;
 import com.br.manager.domain.price_acquisition.dto.PriceTableInputDTO;
 import com.br.manager.domain.price_acquisition.dto.PriceTableResponseDTO;
@@ -40,14 +38,11 @@ public class PriceTableService {
     @Autowired
     UserRepository userRepository;
 
-    @Autowired
-    StationRepository stationRepository;
-
     @Transactional
     public PriceTableResponseDTO create(PriceTableInputDTO inputDTO) {
 
         if (inputDTO.getPriceItems() == null || inputDTO.getPriceItems().isEmpty()) {
-            throw new BusinessException("Price table must have at least one price item");
+            throw new BusinessException("A tabela de preços deve conter pelo menos um item");
         }
 
         try {
@@ -55,18 +50,11 @@ public class PriceTableService {
             priceTable.setId(null);
 
            User createdBy = userRepository.findById(inputDTO.getCreatedBy())
-                   .orElseThrow(() -> new NotFoundBusinessException(String.format("User with ID %s not found", inputDTO.getCreatedBy())));
+                   .orElseThrow(() -> new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", inputDTO.getCreatedBy())));
            if (!Boolean.TRUE.equals(createdBy.getActive())) {
-               throw new NotFoundBusinessException(String.format("User with ID %s not found", inputDTO.getCreatedBy()));
+               throw new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", inputDTO.getCreatedBy()));
            }
            priceTable.setCreatedBy(createdBy);
-
-           Station station = stationRepository.findById(inputDTO.getStationId())
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Station with ID %s not found", inputDTO.getStationId())));
-              if (!Boolean.TRUE.equals(station.getActive())) {
-                  throw new NotFoundBusinessException(String.format("Station with ID %s not found", inputDTO.getStationId()));
-              }
-           priceTable.setStation(station);
 
            PriceTable savedPriceTable = priceTableRepository.saveAndFlush(priceTable);
            priceItemService.savePriceItems(savedPriceTable.getId(), inputDTO.getPriceItems());
@@ -83,29 +71,21 @@ public class PriceTableService {
            throw exception;
         } catch (Exception e) {
            String priceTableName = inputDTO != null && StringUtils.hasText(inputDTO.getName()) ? inputDTO.getName() : "";
-           throw new BusinessException("Error while saving price Table " + priceTableName, e);
+           throw new BusinessException("Erro ao salvar tabela de preços " + priceTableName, e);
         }
     }
 
     public PriceTableResponseDTO update(PriceTableInputDTO inputDTO) {
         try {
             PriceTable priceTable = priceTableRepository.findById(inputDTO.getId())
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Price Table with ID %s not found", inputDTO.getId())));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Tabela de preços com ID %s não encontrada", inputDTO.getId())));
 
-            if (inputDTO.getStationId() != null) {
-                Station station = stationRepository.findById(inputDTO.getStationId())
-                        .orElseThrow(() -> new NotFoundBusinessException(String.format("Station with ID %s not found", inputDTO.getStationId())));
-                if (!Boolean.TRUE.equals(station.getActive())) {
-                    throw new NotFoundBusinessException(String.format("Station with ID %s not found", inputDTO.getStationId()));
-                }
-                priceTable.setStation(station);
-            }
 
             if (inputDTO.getCreatedBy() != null) {
                 User createdBy = userRepository.findById(inputDTO.getCreatedBy())
-                        .orElseThrow(() -> new NotFoundBusinessException(String.format("User with ID %s not found", inputDTO.getCreatedBy())));
+                        .orElseThrow(() -> new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", inputDTO.getCreatedBy())));
                 if (!Boolean.TRUE.equals(createdBy.getActive())) {
-                    throw new NotFoundBusinessException(String.format("User with ID %s not found", inputDTO.getCreatedBy()));
+                    throw new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", inputDTO.getCreatedBy()));
                 }
                 priceTable.setCreatedBy(createdBy);
             }
@@ -114,7 +94,7 @@ public class PriceTableService {
             PriceTable savedPriceTable = priceTableRepository.saveAndFlush(priceTable);
 
             if (inputDTO.getPriceItems() != null) {
-                priceItemService.replaceByPriceTable(savedPriceTable.getId(), inputDTO.getPriceItems());
+                priceItemService.replaceByPriceTable(savedPriceTable, inputDTO.getPriceItems());
             }
 
             PriceTableResponseDTO response = priceTableMapper.priceTableToPriceTableResponseDTO(savedPriceTable);
@@ -129,7 +109,7 @@ public class PriceTableService {
             throw exception;
         } catch (Exception e) {
             String priceTableName = inputDTO != null && StringUtils.hasText(inputDTO.getName()) ? inputDTO.getName() : "";
-            throw new BusinessException("Error while saving price Table " + priceTableName, e);
+            throw new BusinessException("Erro ao salvar tabela de preços " + priceTableName, e);
         }
     }
 
@@ -151,14 +131,14 @@ public class PriceTableService {
 
     public PriceTableResponseDTO find(UUID id) {
         PriceTable priceTable = priceTableRepository.findById(id)
-                .orElseThrow(() -> new NotFoundBusinessException(String.format("Price table with ID %s not found", id)));
+                .orElseThrow(() -> new NotFoundBusinessException(String.format("Tabela de preços com ID %s não encontrada", id)));
         return priceTableMapper.priceTableToPriceTableResponseDTO(priceTable);
     }
 
     public void delete(UUID id) {
         try {
             PriceTable priceTable = priceTableRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Price table with ID %s not found", id)));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Tabela de preços com ID %s não encontrada", id)));
             priceTableRepository.delete(priceTable);
         } catch (ConstraintViolationException exception) {
             throw new BusinessException(exception.getConstraintViolations().stream()
@@ -168,12 +148,12 @@ public class PriceTableService {
         } catch (NotFoundBusinessException exception) {
             throw exception;
         } catch (Exception e) {
-            throw new BusinessException("Error while deleting price table", e);
+            throw new BusinessException("Erro ao excluir tabela de preços", e);
         }
     }
 
     public PriceTable getPriceTableEntityById(UUID id) {
         return priceTableRepository.findById(id)
-                .orElseThrow(() -> new NotFoundBusinessException(String.format("Price table with ID %s not found", id)));
+                .orElseThrow(() -> new NotFoundBusinessException(String.format("Tabela de preços com ID %s não encontrada", id)));
     }
 }

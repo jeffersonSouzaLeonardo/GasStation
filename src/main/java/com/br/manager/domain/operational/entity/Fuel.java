@@ -23,12 +23,12 @@ public class Fuel {
     @NotBlank(message = "O nome do combustível é obrigatório.")
     private String name;
 
-    @NotNull(message = "A unidade de medida é obrigatório.")
+    @NotNull(message = "A unidade de medida é obrigatória.")
     @Enumerated(EnumType.STRING)
     @Column(name = "unit")
     private UnitFuelEnum unit;
 
-    @NotNull(message = "O Status do combustível é obrigatório.")
+    @NotNull(message = "O status do combustível é obrigatório.")
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private StatusFuelEnum status;

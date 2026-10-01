@@ -1,7 +1,6 @@
 package com.br.manager.domain.price_acquisition.mapper;
 
 import com.br.manager.domain.operational.entity.Supplier;
-import com.br.manager.domain.organization.entity.Station;
 import com.br.manager.domain.organization.entity.User;
 import com.br.manager.domain.price_acquisition.dto.PurchaseOrderInputDTO;
 import com.br.manager.domain.price_acquisition.dto.PurchaseOrderItemResponseDTO;
@@ -29,18 +28,6 @@ public class PurchaseOrderMapper {
         purchaseOrder.setOrderedAt(dto.getOrderedAt());
         purchaseOrder.setExpectedAt(dto.getExpectedAt());
 
-        if (dto.getStationId() != null) {
-            Station station = new Station();
-            station.setId(dto.getStationId());
-            purchaseOrder.setStation(station);
-        }
-
-        if (dto.getSupplierId() != null) {
-            Supplier supplier = new Supplier();
-            supplier.setId(dto.getSupplierId());
-            purchaseOrder.setSupplier(supplier);
-        }
-
         if (dto.getCreatedBy() != null) {
             User user = new User();
             user.setId(dto.getCreatedBy());
@@ -59,7 +46,6 @@ public class PurchaseOrderMapper {
 
         PurchaseOrderResponseDTO dto = new PurchaseOrderResponseDTO();
         dto.setId(purchaseOrder.getId());
-        dto.setStationId(purchaseOrder.getStation() != null ? purchaseOrder.getStation().getId() : null);
         dto.setSupplierId(purchaseOrder.getSupplier() != null ? purchaseOrder.getSupplier().getId() : null);
         dto.setNumber(purchaseOrder.getNumber());
         dto.setStatus(purchaseOrder.getStatus());

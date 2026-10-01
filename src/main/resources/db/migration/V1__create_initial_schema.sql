@@ -8,7 +8,7 @@
 -- =============================================================================
 
 CREATE TABLE companies (
-                           id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                           id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
                            legal_name VARCHAR(255) NOT NULL,
                            trade_name VARCHAR(255),
                            cnpj VARCHAR(14) NOT NULL UNIQUE,
@@ -24,8 +24,8 @@ CREATE TABLE companies (
 );
 
 CREATE TABLE stations (
-                          id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                          company_id VARCHAR(36) NOT NULL,
+                          id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                          company_id CHAR(36) NOT NULL,
                           name VARCHAR(255) NOT NULL,
                           cnpj VARCHAR(14),
                           state_registration VARCHAR(30),
@@ -50,7 +50,7 @@ CREATE TABLE stations (
 );
 
 CREATE TABLE users (
-                       id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                       id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
                        name VARCHAR(255) NOT NULL,
                        email VARCHAR(255) NOT NULL UNIQUE,
                        password_hash VARCHAR(255) NOT NULL,
@@ -64,10 +64,9 @@ CREATE TABLE users (
 );
 
 CREATE TABLE user_station_roles (
-                                    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                    user_id VARCHAR(36) NOT NULL,
-                                    company_id VARCHAR(36) NOT NULL,
-                                    station_id VARCHAR(36),
+                                    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                    user_id CHAR(36) NOT NULL,
+                                    company_id CHAR(36) NOT NULL,
                                     role ENUM('ADMIN', 'MANAGER', 'CASHIER', 'ATTENDANT') NOT NULL,
                                     active BOOLEAN NOT NULL DEFAULT TRUE,
 
@@ -75,14 +74,13 @@ CREATE TABLE user_station_roles (
                                     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
                                     CONSTRAINT fk_usr_user FOREIGN KEY (user_id) REFERENCES users(id),
-                                    CONSTRAINT fk_usr_company FOREIGN KEY (company_id) REFERENCES companies(id),
-                                    CONSTRAINT fk_usr_station FOREIGN KEY (station_id) REFERENCES stations(id)
+                                    CONSTRAINT fk_usr_company FOREIGN KEY (company_id) REFERENCES companies(id)
 );
 
 CREATE TABLE audit_logs (
-                            id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                            company_id VARCHAR(36) NOT NULL,
-                            user_id VARCHAR(36),
+                            id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                            company_id CHAR(36) NOT NULL,
+                            user_id CHAR(36),
                             entity_name VARCHAR(100) NOT NULL,
                             entity_id VARCHAR(100) NOT NULL,
                             action VARCHAR(50) NOT NULL,
@@ -100,8 +98,7 @@ CREATE TABLE audit_logs (
 -- =============================================================================
 
 CREATE TABLE products (
-                          id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                          company_id VARCHAR(36) NOT NULL,
+                          id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
                           sku VARCHAR(100) NOT NULL,
                           name VARCHAR(255) NOT NULL,
                           product_type ENUM('FUEL', 'LUBRICANT', 'SERVICE', 'CONVENIENCE') NOT NULL,
@@ -110,57 +107,46 @@ CREATE TABLE products (
                           ncm VARCHAR(10),
                           cest VARCHAR(10),
                           active BOOLEAN NOT NULL DEFAULT TRUE,
-                          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 
-                          CONSTRAINT uk_product_company_sku UNIQUE (company_id, sku),
-                          CONSTRAINT fk_products_company FOREIGN KEY (company_id) REFERENCES companies(id)
 );
 
 CREATE TABLE station_products (
-                                  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                  station_id VARCHAR(36) NOT NULL,
-                                  product_id VARCHAR(36) NOT NULL,
+                                  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                  product_id CHAR(36) NOT NULL,
                                   min_stock DECIMAL(15, 4) DEFAULT 0,
                                   reorder_point DECIMAL(15, 4) DEFAULT 0,
                                   active BOOLEAN NOT NULL DEFAULT TRUE,
 
-                                  CONSTRAINT uk_station_product UNIQUE (station_id, product_id),
-                                  CONSTRAINT fk_sp_station FOREIGN KEY (station_id) REFERENCES stations(id),
                                   CONSTRAINT fk_sp_product FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
 CREATE TABLE tanks (
-                       id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                       station_id VARCHAR(36) NOT NULL,
+                       id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
                        code VARCHAR(50) NOT NULL,
-                       product_id VARCHAR(36) NOT NULL,
+                       product_id CHAR(36) NOT NULL,
                        capacity_liters DECIMAL(15, 4) NOT NULL,
                        dead_stock_liters DECIMAL(15, 4) DEFAULT 0,
                        current_book_liters DECIMAL(15, 4) NOT NULL DEFAULT 0,
                        active BOOLEAN NOT NULL DEFAULT TRUE,
 
-                       CONSTRAINT uk_tank_station_code UNIQUE (station_id, code),
-                       CONSTRAINT fk_tanks_station FOREIGN KEY (station_id) REFERENCES stations(id),
                        CONSTRAINT fk_tanks_product FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
 CREATE TABLE pumps (
-                       id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                       station_id VARCHAR(36) NOT NULL,
+                       id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
                        code VARCHAR(50) NOT NULL,
                        location VARCHAR(100),
-                       active BOOLEAN NOT NULL DEFAULT TRUE,
+                       active BOOLEAN NOT NULL DEFAULT TRUE
 
-                       CONSTRAINT uk_pump_station_code UNIQUE (station_id, code),
-                       CONSTRAINT fk_pumps_station FOREIGN KEY (station_id) REFERENCES stations(id)
 );
 
 CREATE TABLE nozzles (
-                         id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                         pump_id VARCHAR(36) NOT NULL,
-                         tank_id VARCHAR(36) NOT NULL,
+                         id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                         pump_id CHAR(36) NOT NULL,
+                         tank_id CHAR(36) NOT NULL,
                          code VARCHAR(50) NOT NULL,
-                         product_id VARCHAR(36) NOT NULL,
+                         product_id CHAR(36) NOT NULL,
                          meter_number DECIMAL(15, 4) DEFAULT 0,
                          active BOOLEAN NOT NULL DEFAULT TRUE,
 
@@ -170,32 +156,28 @@ CREATE TABLE nozzles (
                          CONSTRAINT fk_nozzles_product FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
-CREATE TABLE suppliers (
-                           id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                           company_id VARCHAR(36) NOT NULL,
-                           legal_name VARCHAR(255) NOT NULL,
-                           cnpj_cpf VARCHAR(14),
-                           state_registration VARCHAR(30),
-                           email VARCHAR(255),
-                           phone VARCHAR(20),
+CREATE TABLE suppliers
+(
+    id                   CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    legal_name           VARCHAR(255) NOT NULL,
+    cnpj_cpf             VARCHAR(14),
+    state_registration   VARCHAR(30),
+    email                VARCHAR(255),
+    phone                VARCHAR(20),
 
     -- Address Embedded
-                           address_street VARCHAR(255),
-                           address_number VARCHAR(20),
-                           address_complement VARCHAR(100),
-                           address_neighborhood VARCHAR(100),
-                           address_city VARCHAR(100),
-                           address_state VARCHAR(2),
-                           address_zip_code VARCHAR(10),
-
-                           active BOOLEAN NOT NULL DEFAULT TRUE,
-
-                           CONSTRAINT fk_suppliers_company FOREIGN KEY (company_id) REFERENCES companies(id)
+    address_street       VARCHAR(255),
+    address_number       VARCHAR(20),
+    address_complement   VARCHAR(100),
+    address_neighborhood VARCHAR(100),
+    address_city         VARCHAR(100),
+    address_state        VARCHAR(2),
+    address_zip_code     VARCHAR(10),
+    active               BOOLEAN      NOT NULL   DEFAULT TRUE
 );
 
 CREATE TABLE customers (
-                           id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                           company_id VARCHAR(36) NOT NULL,
+                           id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
                            name VARCHAR(255) NOT NULL,
                            person_type ENUM('PHYSICAL', 'JURIDICAL') NOT NULL,
                            cnpj_cpf VARCHAR(14),
@@ -213,14 +195,12 @@ CREATE TABLE customers (
                            address_zip_code VARCHAR(10),
 
                            credit_limit DECIMAL(15, 2) DEFAULT 0,
-                           active BOOLEAN NOT NULL DEFAULT TRUE,
-
-                           CONSTRAINT fk_customers_company FOREIGN KEY (company_id) REFERENCES companies(id)
+                           active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE customer_vehicles (
-                                   id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                   customer_id VARCHAR(36) NOT NULL,
+                                   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                   customer_id CHAR(36) NOT NULL,
                                    plate VARCHAR(10) NOT NULL,
                                    brand VARCHAR(50),
                                    model VARCHAR(50),
@@ -231,15 +211,13 @@ CREATE TABLE customer_vehicles (
 );
 
 CREATE TABLE payment_methods (
-                                 id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                 company_id VARCHAR(36) NOT NULL,
+                                 id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
                                  name VARCHAR(100) NOT NULL,
                                  kind VARCHAR(50) NOT NULL,
                                  requires_reference BOOLEAN NOT NULL DEFAULT FALSE,
                                  settlement_days INT DEFAULT 0,
-                                 active BOOLEAN NOT NULL DEFAULT TRUE,
+                                 active BOOLEAN NOT NULL DEFAULT TRUE
 
-                                 CONSTRAINT fk_pm_company FOREIGN KEY (company_id) REFERENCES companies(id)
 );
 
 -- =============================================================================
@@ -247,23 +225,21 @@ CREATE TABLE payment_methods (
 -- =============================================================================
 
 CREATE TABLE price_tables (
-                              id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                              station_id VARCHAR(36) NOT NULL,
+                              id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
                               name VARCHAR(100) NOT NULL,
                               valid_from DATETIME NOT NULL,
                               valid_to DATETIME,
                               status VARCHAR(20) NOT NULL,
-                              created_by VARCHAR(36) NOT NULL,
+                              created_by CHAR(36) NOT NULL,
 
-                              CONSTRAINT fk_pt_station FOREIGN KEY (station_id) REFERENCES stations(id),
                               CONSTRAINT fk_pt_user FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
 CREATE TABLE price_items (
-                             id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                             price_table_id VARCHAR(36) NOT NULL,
-                             product_id VARCHAR(36) NOT NULL,
-                             nozzle_id VARCHAR(36),
+                             id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                             price_table_id CHAR(36) NOT NULL,
+                             product_id CHAR(36) NOT NULL,
+                             nozzle_id CHAR(36),
                              unit_price DECIMAL(15, 4) NOT NULL,
                              min_price DECIMAL(15, 4),
                              max_discount_percent DECIMAL(5, 2),
@@ -275,24 +251,22 @@ CREATE TABLE price_items (
 );
 
 CREATE TABLE purchase_orders (
-                                 id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                 station_id VARCHAR(36) NOT NULL,
-                                 supplier_id VARCHAR(36) NOT NULL,
+                                 id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                 supplier_id CHAR(36) NOT NULL,
                                  number VARCHAR(50),
                                  status VARCHAR(30) NOT NULL,
                                  ordered_at DATETIME,
                                  expected_at DATETIME,
-                                 created_by VARCHAR(36) NOT NULL,
+                                 created_by CHAR(36) NOT NULL,
 
     -- Transversais
                                  approval_status ENUM('PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING',
-                                 approved_by VARCHAR(36),
+                                 approved_by CHAR(36),
                                  approved_at DATETIME,
                                  cancelled_at DATETIME,
-                                 cancelled_by VARCHAR(36),
+                                 cancelled_by CHAR(36),
                                  cancellation_reason TEXT,
 
-                                 CONSTRAINT fk_po_station FOREIGN KEY (station_id) REFERENCES stations(id),
                                  CONSTRAINT fk_po_supplier FOREIGN KEY (supplier_id) REFERENCES suppliers(id),
                                  CONSTRAINT fk_po_created_by FOREIGN KEY (created_by) REFERENCES users(id),
                                  CONSTRAINT fk_po_approved_by FOREIGN KEY (approved_by) REFERENCES users(id),
@@ -300,9 +274,9 @@ CREATE TABLE purchase_orders (
 );
 
 CREATE TABLE purchase_order_items (
-                                      id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                      purchase_order_id VARCHAR(36) NOT NULL,
-                                      product_id VARCHAR(36) NOT NULL,
+                                      id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                      purchase_order_id CHAR(36) NOT NULL,
+                                      product_id CHAR(36) NOT NULL,
                                       quantity DECIMAL(15, 4) NOT NULL,
                                       unit_cost DECIMAL(15, 4) NOT NULL,
 
@@ -311,32 +285,29 @@ CREATE TABLE purchase_order_items (
 );
 
 CREATE TABLE goods_receipts (
-                                id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                station_id VARCHAR(36) NOT NULL,
-                                supplier_id VARCHAR(36) NOT NULL,
-                                purchase_order_id VARCHAR(36),
+                                id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                supplier_id CHAR(36) NOT NULL,
+                                purchase_order_id CHAR(36),
                                 invoice_number VARCHAR(50),
                                 invoice_key VARCHAR(44),
                                 received_at DATETIME NOT NULL,
                                 status VARCHAR(30) NOT NULL,
                                 freight_amount DECIMAL(15, 2) DEFAULT 0,
                                 other_costs DECIMAL(15, 2) DEFAULT 0,
-                                received_by VARCHAR(36) NOT NULL,
+                                received_by CHAR(36) NOT NULL,
 
-                                CONSTRAINT fk_gr_station FOREIGN KEY (station_id) REFERENCES stations(id),
                                 CONSTRAINT fk_gr_supplier FOREIGN KEY (supplier_id) REFERENCES suppliers(id),
                                 CONSTRAINT fk_gr_po FOREIGN KEY (purchase_order_id) REFERENCES purchase_orders(id),
                                 CONSTRAINT fk_gr_received_by FOREIGN KEY (received_by) REFERENCES users(id)
 );
 
 CREATE TABLE goods_receipt_items (
-                                     id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                     goods_receipt_id VARCHAR(36) NOT NULL,
-                                     product_id VARCHAR(36) NOT NULL,
-                                     tank_id VARCHAR(36),
+                                     id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                     goods_receipt_id CHAR(36) NOT NULL,
+                                     product_id CHAR(36) NOT NULL,
+                                     tank_id CHAR(36),
                                      quantity DECIMAL(15, 4) NOT NULL,
                                      unit_cost DECIMAL(15, 4) NOT NULL,
-                                     total_cost DECIMAL(15, 2) NOT NULL,
 
                                      CONSTRAINT fk_gri_receipt FOREIGN KEY (goods_receipt_id) REFERENCES goods_receipts(id),
                                      CONSTRAINT fk_gri_product FOREIGN KEY (product_id) REFERENCES products(id),
@@ -348,27 +319,25 @@ CREATE TABLE goods_receipt_items (
 -- =============================================================================
 
 CREATE TABLE shifts (
-                        id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                        station_id VARCHAR(36) NOT NULL,
-                        cashier_user_id VARCHAR(36) NOT NULL,
+                        id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                        cashier_user_id CHAR(36) NOT NULL,
                         opened_at DATETIME NOT NULL,
                         closed_at DATETIME,
                         opening_cash DECIMAL(15, 2) NOT NULL DEFAULT 0,
                         status VARCHAR(20) NOT NULL,
-                        opened_by VARCHAR(36) NOT NULL,
-                        closed_by VARCHAR(36),
+                        opened_by CHAR(36) NOT NULL,
+                        closed_by CHAR(36),
                         notes TEXT,
 
-                        CONSTRAINT fk_shifts_station FOREIGN KEY (station_id) REFERENCES stations(id),
                         CONSTRAINT fk_shifts_cashier FOREIGN KEY (cashier_user_id) REFERENCES users(id),
                         CONSTRAINT fk_shifts_opened_by FOREIGN KEY (opened_by) REFERENCES users(id),
                         CONSTRAINT fk_shifts_closed_by FOREIGN KEY (closed_by) REFERENCES users(id)
 );
 
 CREATE TABLE shift_allocations (
-                                   id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                   shift_id VARCHAR(36) NOT NULL,
-                                   user_id VARCHAR(36) NOT NULL,
+                                   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                   shift_id CHAR(36) NOT NULL,
+                                   user_id CHAR(36) NOT NULL,
                                    role ENUM('ADMIN', 'MANAGER', 'CASHIER', 'ATTENDANT') NOT NULL,
 
                                    CONSTRAINT fk_sa_shift FOREIGN KEY (shift_id) REFERENCES shifts(id),
@@ -376,13 +345,13 @@ CREATE TABLE shift_allocations (
 );
 
 CREATE TABLE nozzle_readings (
-                                 id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                 shift_id VARCHAR(36) NOT NULL,
-                                 nozzle_id VARCHAR(36) NOT NULL,
+                                 id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                 shift_id CHAR(36) NOT NULL,
+                                 nozzle_id CHAR(36) NOT NULL,
                                  reading_type ENUM('OPENING', 'CLOSING', 'TEST', 'CALIBRATION') NOT NULL,
                                  meter_reading DECIMAL(15, 4) NOT NULL,
                                  read_at DATETIME NOT NULL,
-                                 recorded_by VARCHAR(36) NOT NULL,
+                                 recorded_by CHAR(36) NOT NULL,
                                  notes TEXT,
 
                                  CONSTRAINT fk_nr_shift FOREIGN KEY (shift_id) REFERENCES shifts(id),
@@ -391,21 +360,21 @@ CREATE TABLE nozzle_readings (
 );
 
 CREATE TABLE cash_movements (
-                                id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                shift_id VARCHAR(36) NOT NULL,
+                                id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                shift_id CHAR(36) NOT NULL,
                                 movement_type ENUM('OPENING', 'SALE', 'WITHDRAWAL', 'CASH_IN', 'REFUND', 'ADJUSTMENT', 'CLOSING') NOT NULL,
-                                payment_method_id VARCHAR(36),
+                                payment_method_id CHAR(36),
                                 amount DECIMAL(15, 2) NOT NULL,
                                 occurred_at DATETIME NOT NULL,
                                 reference VARCHAR(100),
                                 reason TEXT,
-                                created_by VARCHAR(36) NOT NULL,
+                                created_by CHAR(36) NOT NULL,
 
     -- Transversais
                                 source_type VARCHAR(50),
                                 source_id VARCHAR(100),
                                 approval_status ENUM('PENDING', 'APPROVED', 'REJECTED'),
-                                approved_by VARCHAR(36),
+                                approved_by CHAR(36),
                                 approved_at DATETIME,
 
                                 CONSTRAINT fk_cm_shift FOREIGN KEY (shift_id) REFERENCES shifts(id),
@@ -415,9 +384,9 @@ CREATE TABLE cash_movements (
 );
 
 CREATE TABLE shift_payment_closings (
-                                        id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                        shift_id VARCHAR(36) NOT NULL,
-                                        payment_method_id VARCHAR(36) NOT NULL,
+                                        id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                        shift_id CHAR(36) NOT NULL,
+                                        payment_method_id CHAR(36) NOT NULL,
                                         expected_amount DECIMAL(15, 2) NOT NULL,
                                         declared_amount DECIMAL(15, 2) NOT NULL,
                                         difference_amount DECIMAL(15, 2) NOT NULL,
@@ -432,32 +401,28 @@ CREATE TABLE shift_payment_closings (
 -- =============================================================================
 
 CREATE TABLE sales (
-                       id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                       station_id VARCHAR(36) NOT NULL,
-                       shift_id VARCHAR(36) NOT NULL,
+                       id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                       shift_id CHAR(36) NOT NULL,
                        sale_number VARCHAR(50) NOT NULL,
                        status ENUM('OPEN', 'PAID', 'CANCELLED', 'REFUNDED', 'PENDING_CREDIT') NOT NULL DEFAULT 'OPEN',
                        sold_at DATETIME NOT NULL,
-                       customer_id VARCHAR(36),
-                       vehicle_id VARCHAR(36),
-                       attendant_user_id VARCHAR(36),
-                       cashier_user_id VARCHAR(36) NOT NULL,
+                       customer_id CHAR(36),
+                       vehicle_id CHAR(36),
+                       attendant_user_id CHAR(36),
+                       cashier_user_id CHAR(36) NOT NULL,
                        subtotal DECIMAL(15, 2) NOT NULL,
                        discount_amount DECIMAL(15, 2) NOT NULL DEFAULT 0,
-                       total_amount DECIMAL(15, 2) NOT NULL,
                        fiscal_status VARCHAR(50),
                        notes TEXT,
 
     -- Transversais
                        approval_status ENUM('PENDING', 'APPROVED', 'REJECTED'),
-                       approved_by VARCHAR(36),
+                       approved_by CHAR(36),
                        approved_at DATETIME,
                        cancelled_at DATETIME,
-                       cancelled_by VARCHAR(36),
+                       cancelled_by CHAR(36),
                        cancellation_reason TEXT,
 
-                       CONSTRAINT uk_sale_station_number UNIQUE (station_id, sale_number),
-                       CONSTRAINT fk_sales_station FOREIGN KEY (station_id) REFERENCES stations(id),
                        CONSTRAINT fk_sales_shift FOREIGN KEY (shift_id) REFERENCES shifts(id),
                        CONSTRAINT fk_sales_customer FOREIGN KEY (customer_id) REFERENCES customers(id),
                        CONSTRAINT fk_sales_vehicle FOREIGN KEY (vehicle_id) REFERENCES customer_vehicles(id),
@@ -468,16 +433,15 @@ CREATE TABLE sales (
 );
 
 CREATE TABLE sale_items (
-                            id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                            sale_id VARCHAR(36) NOT NULL,
+                            id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                            sale_id CHAR(36) NOT NULL,
                             line_number INT NOT NULL,
-                            product_id VARCHAR(36) NOT NULL,
-                            nozzle_id VARCHAR(36),
-                            tank_id VARCHAR(36),
+                            product_id CHAR(36) NOT NULL,
+                            nozzle_id CHAR(36),
+                            tank_id CHAR(36),
                             quantity DECIMAL(15, 4) NOT NULL,
                             unit_price DECIMAL(15, 4) NOT NULL,
                             discount_amount DECIMAL(15, 2) NOT NULL DEFAULT 0,
-                            total_amount DECIMAL(15, 2) NOT NULL,
                             meter_start DECIMAL(15, 4),
                             meter_end DECIMAL(15, 4),
 
@@ -489,10 +453,9 @@ CREATE TABLE sale_items (
 );
 
 CREATE TABLE sale_payments (
-                               id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                               sale_id VARCHAR(36) NOT NULL,
-                               payment_method_id VARCHAR(36) NOT NULL,
-                               amount DECIMAL(15, 2) NOT NULL,
+                               id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                               sale_id CHAR(36) NOT NULL,
+                               payment_method_id CHAR(36) NOT NULL,
                                status VARCHAR(30) NOT NULL,
                                transaction_reference VARCHAR(100),
                                authorized_at DATETIME,
@@ -503,11 +466,11 @@ CREATE TABLE sale_payments (
 );
 
 CREATE TABLE sale_refunds (
-                              id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                              sale_id VARCHAR(36) NOT NULL,
+                              id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                              sale_id CHAR(36) NOT NULL,
                               reason TEXT NOT NULL,
-                              requested_by VARCHAR(36) NOT NULL,
-                              approved_by VARCHAR(36) NOT NULL,
+                              requested_by CHAR(36) NOT NULL,
+                              approved_by CHAR(36) NOT NULL,
                               refunded_at DATETIME NOT NULL,
                               notes TEXT,
 
@@ -525,33 +488,31 @@ CREATE TABLE sale_refunds (
 -- =============================================================================
 
 CREATE TABLE stock_movements (
-                                 id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                 station_id VARCHAR(36) NOT NULL,
-                                 product_id VARCHAR(36) NOT NULL,
-                                 tank_id VARCHAR(36),
+                                 id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                 product_id CHAR(36) NOT NULL,
+                                 tank_id CHAR(36),
                                  movement_type ENUM('PURCHASE_RECEIPT', 'SALE', 'RETURN', 'TRANSFER_IN', 'TRANSFER_OUT', 'INVENTORY_ADJUSTMENT', 'LOSS', 'TEST', 'OPENING_BALANCE') NOT NULL,
                                  quantity DECIMAL(15, 4) NOT NULL,
                                  unit_cost DECIMAL(15, 4),
                                  occurred_at DATETIME NOT NULL,
                                  source_type VARCHAR(50) NOT NULL,
                                  source_id VARCHAR(100) NOT NULL,
-                                 created_by VARCHAR(36) NOT NULL,
+                                 created_by CHAR(36) NOT NULL,
                                  notes TEXT,
 
-                                 CONSTRAINT fk_sm_station FOREIGN KEY (station_id) REFERENCES stations(id),
                                  CONSTRAINT fk_sm_product FOREIGN KEY (product_id) REFERENCES products(id),
                                  CONSTRAINT fk_sm_tank FOREIGN KEY (tank_id) REFERENCES tanks(id),
                                  CONSTRAINT fk_sm_created_by FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
 CREATE TABLE tank_measurements (
-                                   id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                   tank_id VARCHAR(36) NOT NULL,
+                                   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                   tank_id CHAR(36) NOT NULL,
                                    measured_at DATETIME NOT NULL,
                                    volume_liters DECIMAL(15, 4) NOT NULL,
                                    water_liters DECIMAL(15, 4),
                                    temperature_celsius DECIMAL(4, 2),
-                                   recorded_by VARCHAR(36) NOT NULL,
+                                   recorded_by CHAR(36) NOT NULL,
                                    notes TEXT,
 
                                    CONSTRAINT fk_tm_tank FOREIGN KEY (tank_id) REFERENCES tanks(id),
@@ -559,32 +520,30 @@ CREATE TABLE tank_measurements (
 );
 
 CREATE TABLE inventories (
-                             id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                             station_id VARCHAR(36) NOT NULL,
+                             id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
                              started_at DATETIME NOT NULL,
                              finished_at DATETIME,
                              status VARCHAR(30) NOT NULL,
-                             created_by VARCHAR(36) NOT NULL,
-                             approved_by VARCHAR(36),
+                             created_by CHAR(36) NOT NULL,
+                             approved_by CHAR(36),
 
     -- Transversais
                              approval_status ENUM('PENDING', 'APPROVED', 'REJECTED'),
                              approved_at DATETIME,
 
-                             CONSTRAINT fk_inv_station FOREIGN KEY (station_id) REFERENCES stations(id),
                              CONSTRAINT fk_inv_created_by FOREIGN KEY (created_by) REFERENCES users(id),
                              CONSTRAINT fk_inv_approved_by FOREIGN KEY (approved_by) REFERENCES users(id)
 );
 
 CREATE TABLE inventory_items (
-                                 id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                 inventory_id VARCHAR(36) NOT NULL,
-                                 product_id VARCHAR(36) NOT NULL,
-                                 tank_id VARCHAR(36),
+                                 id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                 inventory_id CHAR(36) NOT NULL,
+                                 product_id CHAR(36) NOT NULL,
+                                 tank_id CHAR(36),
                                  book_quantity DECIMAL(15, 4) NOT NULL,
                                  counted_quantity DECIMAL(15, 4) NOT NULL,
                                  difference_quantity DECIMAL(15, 4) NOT NULL,
-                                 adjustment_movement_id VARCHAR(36),
+                                 adjustment_movement_id CHAR(36),
 
                                  CONSTRAINT fk_ii_inventory FOREIGN KEY (inventory_id) REFERENCES inventories(id),
                                  CONSTRAINT fk_ii_product FOREIGN KEY (product_id) REFERENCES products(id),
@@ -593,11 +552,9 @@ CREATE TABLE inventory_items (
 );
 
 CREATE TABLE accounts_receivable (
-                                     id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                     company_id VARCHAR(36) NOT NULL,
-                                     station_id VARCHAR(36) NOT NULL,
-                                     customer_id VARCHAR(36) NOT NULL,
-                                     sale_id VARCHAR(36),
+                                     id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                     customer_id CHAR(36) NOT NULL,
+                                     sale_id CHAR(36),
                                      due_date DATE NOT NULL,
                                      original_amount DECIMAL(15, 2) NOT NULL,
                                      open_amount DECIMAL(15, 2) NOT NULL,
@@ -607,24 +564,22 @@ CREATE TABLE accounts_receivable (
                                      source_type VARCHAR(50),
                                      source_id VARCHAR(100),
                                      cancelled_at DATETIME,
-                                     cancelled_by VARCHAR(36),
+                                     cancelled_by CHAR(36),
                                      cancellation_reason TEXT,
 
-                                     CONSTRAINT fk_ar_company FOREIGN KEY (company_id) REFERENCES companies(id),
-                                     CONSTRAINT fk_ar_station FOREIGN KEY (station_id) REFERENCES stations(id),
                                      CONSTRAINT fk_ar_customer FOREIGN KEY (customer_id) REFERENCES customers(id),
                                      CONSTRAINT fk_ar_sale FOREIGN KEY (sale_id) REFERENCES sales(id),
                                      CONSTRAINT fk_ar_cancelled_by FOREIGN KEY (cancelled_by) REFERENCES users(id)
 );
 
 CREATE TABLE financial_receipts (
-                                    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                    receivable_id VARCHAR(36) NOT NULL,
-                                    payment_method_id VARCHAR(36) NOT NULL,
+                                    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                    receivable_id CHAR(36) NOT NULL,
+                                    payment_method_id CHAR(36) NOT NULL,
                                     amount DECIMAL(15, 2) NOT NULL,
                                     received_at DATETIME NOT NULL,
                                     reference VARCHAR(100),
-                                    received_by VARCHAR(36) NOT NULL,
+                                    received_by CHAR(36) NOT NULL,
 
                                     CONSTRAINT fk_fr_receivable FOREIGN KEY (receivable_id) REFERENCES accounts_receivable(id),
                                     CONSTRAINT fk_fr_pm FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id),
@@ -632,11 +587,9 @@ CREATE TABLE financial_receipts (
 );
 
 CREATE TABLE accounts_payable (
-                                  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-                                  company_id VARCHAR(36) NOT NULL,
-                                  station_id VARCHAR(36) NOT NULL,
-                                  supplier_id VARCHAR(36),
-                                  goods_receipt_id VARCHAR(36),
+                                  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+                                  supplier_id CHAR(36),
+                                  goods_receipt_id CHAR(36),
                                   description VARCHAR(255) NOT NULL,
                                   due_date DATE NOT NULL,
                                   original_amount DECIMAL(15, 2) NOT NULL,
@@ -647,11 +600,10 @@ CREATE TABLE accounts_payable (
                                   source_type VARCHAR(50),
                                   source_id VARCHAR(100),
                                   cancelled_at DATETIME,
-                                  cancelled_by VARCHAR(36),
+                                  cancelled_by CHAR(36),
                                   cancellation_reason TEXT,
+                                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-                                  CONSTRAINT fk_ap_company FOREIGN KEY (company_id) REFERENCES companies(id),
-                                  CONSTRAINT fk_ap_station FOREIGN KEY (station_id) REFERENCES stations(id),
                                   CONSTRAINT fk_ap_supplier FOREIGN KEY (supplier_id) REFERENCES suppliers(id),
                                   CONSTRAINT fk_ap_receipt FOREIGN KEY (goods_receipt_id) REFERENCES goods_receipts(id),
                                   CONSTRAINT fk_ap_cancelled_by FOREIGN KEY (cancelled_by) REFERENCES users(id)
@@ -661,13 +613,7 @@ CREATE TABLE accounts_payable (
 -- 7. ÍNDICES DE PERFORMANCE
 -- =============================================================================
 
-CREATE INDEX idx_stations_company ON stations(company_id);
-CREATE INDEX idx_user_station_roles_user ON user_station_roles(user_id);
-CREATE INDEX idx_products_company ON products(company_id);
-CREATE INDEX idx_tanks_station ON tanks(station_id);
 CREATE INDEX idx_nozzles_pump ON nozzles(pump_id);
-CREATE INDEX idx_sales_station_shift ON sales(station_id, shift_id);
 CREATE INDEX idx_sale_items_sale ON sale_items(sale_id);
-CREATE INDEX idx_stock_movements_station_product ON stock_movements(station_id, product_id);
 CREATE INDEX idx_accounts_receivable_customer ON accounts_receivable(customer_id);
 CREATE INDEX idx_accounts_payable_supplier ON accounts_payable(supplier_id);

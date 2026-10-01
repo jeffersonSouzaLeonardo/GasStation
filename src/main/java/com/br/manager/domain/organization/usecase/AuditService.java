@@ -28,9 +28,6 @@ public class AuditService {
     public AuditResponseDTO create(AuditInputDTO inputDTO) {
         try {
             Audit audit = auditMapper.auditInputDTOToAudit(inputDTO);
-            if (audit.getId() == null) {
-                audit.setId(UUID.randomUUID());
-            }
             if (audit.getCreatedAt() == null) {
                 audit.setCreatedAt(OffsetDateTime.now());
             }
@@ -42,14 +39,14 @@ public class AuditService {
                     .toString());
         } catch (Exception e) {
             String entityName = inputDTO != null && StringUtils.hasText(inputDTO.getEntityName()) ? inputDTO.getEntityName() : "";
-            throw new BusinessException("Error while saving audit " + entityName, e);
+            throw new BusinessException("Erro ao salvar auditoria " + entityName, e);
         }
     }
 
     public AuditResponseDTO update(AuditInputDTO inputDTO) {
         try {
             Audit audit = auditRepository.findById(inputDTO.getId())
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Audit with ID %s not found", inputDTO.getId())));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Auditoria com ID %s não encontrada", inputDTO.getId())));
             auditMapper.updateAuditFromDto(inputDTO, audit);
             return auditMapper.auditToAuditResponseDTO(auditRepository.saveAndFlush(audit));
         } catch (ConstraintViolationException exception) {
@@ -61,7 +58,7 @@ public class AuditService {
             throw e;
         } catch (Exception e) {
             String entityName = inputDTO != null && StringUtils.hasText(inputDTO.getEntityName()) ? inputDTO.getEntityName() : "";
-            throw new BusinessException("Error while saving audit " + entityName, e);
+            throw new BusinessException("Erro ao salvar auditoria " + entityName, e);
         }
     }
 
@@ -83,14 +80,14 @@ public class AuditService {
 
     public AuditResponseDTO find(UUID id) {
         Audit audit = auditRepository.findById(id)
-                .orElseThrow(() -> new NotFoundBusinessException(String.format("Audit with ID %s not found", id)));
+                .orElseThrow(() -> new NotFoundBusinessException(String.format("Auditoria com ID %s não encontrada", id)));
         return auditMapper.auditToAuditResponseDTO(audit);
     }
 
     public void delete(UUID id) {
         try {
             Audit audit = auditRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Audit with ID %s not found", id)));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Auditoria com ID %s não encontrada", id)));
             auditRepository.delete(audit);
         } catch (ConstraintViolationException exception) {
             throw new BusinessException(exception.getConstraintViolations().stream()
@@ -100,12 +97,12 @@ public class AuditService {
         } catch (NotFoundBusinessException e) {
             throw e;
         } catch (Exception e) {
-            throw new BusinessException("Error while deleting audit", e);
+            throw new BusinessException("Erro ao excluir auditoria", e);
         }
     }
 
     public Audit getAuditEntityById(UUID id) {
         return auditRepository.findById(id)
-                .orElseThrow(() -> new NotFoundBusinessException(String.format("Audit with ID %s not found", id)));
+                .orElseThrow(() -> new NotFoundBusinessException(String.format("Auditoria com ID %s não encontrada", id)));
     }
 }

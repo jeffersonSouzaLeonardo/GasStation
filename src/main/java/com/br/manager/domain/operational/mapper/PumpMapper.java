@@ -9,12 +9,12 @@ import org.mapstruct.MappingTarget;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface PumpMapper {
-    Pump pumpInputDTOToPump(PumpInputDTO inputDTO);
+public abstract class PumpMapper {
+    public abstract Pump pumpInputDTOToPump(PumpInputDTO inputDTO);
 
-    PumpResponseDTO pumpToPumpResponseDTO(Pump entity);
+    public abstract PumpResponseDTO pumpToPumpResponseDTO(Pump entity);
 
-    List<PumpResponseDTO> listPumpToListPumpResponseDTO(List<Pump> entities);
+    public abstract List<PumpResponseDTO> listPumpToListPumpResponseDTO(List<Pump> entities);
 
-    void updatePumpFromDto(PumpInputDTO dto, @MappingTarget Pump entity);
+    public abstract void updatePumpFromDto(PumpInputDTO dto, @MappingTarget Pump entity);
 }

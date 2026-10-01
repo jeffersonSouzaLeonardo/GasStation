@@ -1,13 +1,7 @@
 package com.br.manager.domain.operational.entity;
 
 import com.br.manager.domain.operational.enums.PersonTypeEnum;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -19,12 +13,9 @@ import java.util.UUID;
 public class Customer {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
-
-    @NotNull(message = "Company ID is required.")
-    @Column(name = "company_id", nullable = false)
-    private UUID companyId;
 
     @NotBlank(message = "Customer name is required.")
     @Column(name = "name", nullable = false)
@@ -74,14 +65,8 @@ public class Customer {
     @NotNull(message = "Active flag is required.")
     @Column(name = "active", nullable = false)
     private Boolean active = true;
-
-    @PrePersist
-    public void ensureId() { if (this.id == null) { this.id = UUID.randomUUID(); } }
-
-    public UUID getId() { return id; }
+public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
-    public UUID getCompanyId() { return companyId; }
-    public void setCompanyId(UUID companyId) { this.companyId = companyId; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public PersonTypeEnum getPersonType() { return personType; }

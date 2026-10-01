@@ -13,7 +13,5 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, UU
 
     Optional<PurchaseOrder> findByNumber(String number);
 
-    List<PurchaseOrder> findByStationId(UUID stationId);
-
     List<PurchaseOrder> findBySupplierId(UUID supplierId);
 }

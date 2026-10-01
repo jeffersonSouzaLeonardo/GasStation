@@ -17,11 +17,11 @@ public class Station {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @NotNull(message = "Company ID is required.")
+    @NotNull(message = "O ID da empresa é obrigatório.")
     @Column(name = "company_id", nullable = false)
     private UUID companyId;
 
-    @NotBlank(message = "Station name is required.")
+    @NotBlank(message = "O nome do posto é obrigatório.")
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -52,11 +52,11 @@ public class Station {
     @Column(name = "address_zip_code", length = 10)
     private String addressZipCode;
 
-    @NotBlank(message = "Timezone is required.")
+    @NotBlank(message = "O fuso horário é obrigatório.")
     @Column(name = "timezone", nullable = false)
     private String timezone = "America/Sao_Paulo";
 
-    @NotNull(message = "Active flag is required.")
+    @NotNull(message = "O campo ativo é obrigatório.")
     @Column(name = "active", nullable = false)
     private Boolean active = true;
 

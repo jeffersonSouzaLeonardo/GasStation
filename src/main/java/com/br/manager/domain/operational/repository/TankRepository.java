@@ -12,6 +12,4 @@ public interface TankRepository extends JpaRepository<Tank, UUID> {
     List<Tank> findAllByActiveTrue();
     Tank findByIdAndActiveTrue(UUID id);
     List<Tank> findByCodeContainingIgnoreCaseAndActiveTrue(String code);
-    List<Tank> findByStationIdAndActiveTrue(UUID stationId);
-    List<Tank> findByProductIdAndActiveTrue(UUID productId);
 }

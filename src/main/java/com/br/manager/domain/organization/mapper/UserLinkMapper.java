@@ -9,13 +9,12 @@ import org.mapstruct.MappingTarget;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface UserLinkMapper {
+public abstract class UserLinkMapper {
+    public abstract UserLink userLinkInputDTOToUserLink(UserLinkInputDTO inputDTO);
 
-    UserLink userLinkInputDTOToUserLink(UserLinkInputDTO inputDTO);
+    public abstract UserLinkResponseDTO userLinkToUserLinkResponseDTO(UserLink userLink);
 
-    UserLinkResponseDTO userLinkToUserLinkResponseDTO(UserLink userLink);
+    public abstract List<UserLinkResponseDTO> listUserLinkToListUserLinkResponseDTO(List<UserLink> userLinks);
 
-    List<UserLinkResponseDTO> listUserLinkToListUserLinkResponseDTO(List<UserLink> userLinks);
-
-    void updateUserLinkFromDto(UserLinkInputDTO dto, @MappingTarget UserLink entity);
+    public abstract void updateUserLinkFromDto(UserLinkInputDTO dto, @MappingTarget UserLink entity);
 }

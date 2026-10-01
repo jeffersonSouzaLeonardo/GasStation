@@ -4,15 +4,12 @@ import com.br.manager.domain.common.exception.BusinessException;
 import com.br.manager.domain.common.exception.NotFoundBusinessException;
 import com.br.manager.domain.operational.entity.Supplier;
 import com.br.manager.domain.operational.repository.SupplierRepository;
-import com.br.manager.domain.organization.entity.Station;
 import com.br.manager.domain.organization.entity.User;
-import com.br.manager.domain.organization.repository.StationRepository;
 import com.br.manager.domain.organization.repository.UserRepository;
 import com.br.manager.domain.price_acquisition.dto.PurchaseOrderInputDTO;
 import com.br.manager.domain.price_acquisition.dto.PurchaseOrderItemInputDTO;
 import com.br.manager.domain.price_acquisition.dto.PurchaseOrderResponseDTO;
 import com.br.manager.domain.price_acquisition.entity.PurchaseOrder;
-import com.br.manager.domain.price_acquisition.entity.PurchaseOrderItem;
 import com.br.manager.domain.price_acquisition.mapper.PurchaseOrderMapper;
 import com.br.manager.domain.price_acquisition.repository.PurchaseOrderItemRepository;
 import com.br.manager.domain.price_acquisition.repository.PurchaseOrderRepository;
@@ -42,9 +39,6 @@ public class PurchaseOrderService {
     private PurchaseOrderItemService purchaseOrderItemService;
 
     @Autowired
-    private StationRepository stationRepository;
-
-    @Autowired
     private SupplierRepository supplierRepository;
 
     @Autowired
@@ -54,42 +48,48 @@ public class PurchaseOrderService {
     public PurchaseOrderResponseDTO create(PurchaseOrderInputDTO inputDTO) {
         validateCreate(inputDTO);
 
-        PurchaseOrder purchaseOrder = purchaseOrderMapper.toEntity(inputDTO);
-        purchaseOrder.setId(null);
-        purchaseOrder.setStatus(PurchaseOrder.Status.DRAFT);
-        purchaseOrder.setOrderedAt(inputDTO.getOrderedAt() != null ? inputDTO.getOrderedAt() : LocalDateTime.now());
-        purchaseOrder.setExpectedAt(inputDTO.getExpectedAt());
+        try {
+            PurchaseOrder purchaseOrder = purchaseOrderMapper.toEntity(inputDTO);
+            purchaseOrder.setId(null);
+            purchaseOrder.setStatus(PurchaseOrder.Status.DRAFT);
+            purchaseOrder.setOrderedAt(inputDTO.getOrderedAt() != null ? inputDTO.getOrderedAt() : LocalDateTime.now());
+            purchaseOrder.setExpectedAt(inputDTO.getExpectedAt());
 
-        Station station = stationRepository.findById(inputDTO.getStationId())
-                .orElseThrow(() -> new NotFoundBusinessException(String.format("Station with ID %s not found", inputDTO.getStationId())));
-        if (!Boolean.TRUE.equals(station.getActive())) {
-            throw new NotFoundBusinessException(String.format("Station with ID %s not found", inputDTO.getStationId()));
+            Supplier supplier = supplierRepository.findById(inputDTO.getSupplierId())
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Fornecedor com ID %s não encontrado", inputDTO.getSupplierId())));
+            if (!Boolean.TRUE.equals(supplier.getActive())) {
+                throw new NotFoundBusinessException(String.format("Fornecedor com ID %s não encontrado", inputDTO.getSupplierId()));
+            }
+            purchaseOrder.setSupplier(supplier);
+            if (inputDTO.getCreatedBy() != null) {
+                User createdBy = userRepository.findById(inputDTO.getCreatedBy())
+                        .orElseThrow(() -> new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", inputDTO.getCreatedBy())));
+                if (!Boolean.TRUE.equals(createdBy.getActive())) {
+                    throw new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", inputDTO.getCreatedBy()));
+                }
+                purchaseOrder.setCreatedBy(createdBy);
+            }
+
+            PurchaseOrder saved = purchaseOrderRepository.saveAndFlush(purchaseOrder);
+            // save items via service
+            purchaseOrderItemService.savePurchaseOrderItems(saved.getId(), inputDTO.getItems());
+            saved.setItems(purchaseOrderItemRepository.findByPurchaseOrderId(saved.getId()));
+            return purchaseOrderMapper.toResponseDTO(saved);
+        } catch (jakarta.validation.ConstraintViolationException exception) {
+            throw new BusinessException(exception.getConstraintViolations().stream()
+                    .map(v -> v.getMessage())
+                    .toList()
+                    .toString());
+        } catch (NotFoundBusinessException exception) {
+            throw exception;
+        } catch (Exception e) {
+            throw new BusinessException("Erro ao salvar pedido de compra", e);
         }
-        purchaseOrder.setStation(station);
-
-        Supplier supplier = supplierRepository.findById(inputDTO.getSupplierId())
-                .orElseThrow(() -> new NotFoundBusinessException(String.format("Supplier with ID %s not found", inputDTO.getSupplierId())));
-        if (!Boolean.TRUE.equals(supplier.getActive())) {
-            throw new NotFoundBusinessException(String.format("Supplier with ID %s not found", inputDTO.getSupplierId()));
-        }
-        purchaseOrder.setSupplier(supplier);
-
-        User user = userRepository.findById(inputDTO.getCreatedBy())
-                .orElseThrow(() -> new NotFoundBusinessException(String.format("User with ID %s not found", inputDTO.getCreatedBy())));
-        if (!Boolean.TRUE.equals(user.getActive())) {
-            throw new NotFoundBusinessException(String.format("User with ID %s not found", inputDTO.getCreatedBy()));
-        }
-        purchaseOrder.setCreatedBy(user);
-
-        PurchaseOrder saved = purchaseOrderRepository.saveAndFlush(purchaseOrder);
-        saveItemsForPurchaseOrder(saved.getId(), inputDTO.getItems());
-        saved.setItems(purchaseOrderItemRepository.findByPurchaseOrderId(saved.getId()));
-        return purchaseOrderMapper.toResponseDTO(saved);
     }
 
     public PurchaseOrderResponseDTO findById(UUID id) {
         PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(id)
-                .orElseThrow(() -> new NotFoundBusinessException(String.format("Purchase order with ID %s not found", id)));
+                .orElseThrow(() -> new NotFoundBusinessException(String.format("Pedido de compra com ID %s não encontrado", id)));
         purchaseOrder.setItems(purchaseOrderItemRepository.findByPurchaseOrderId(id));
         return purchaseOrderMapper.toResponseDTO(purchaseOrder);
     }
@@ -101,37 +101,49 @@ public class PurchaseOrderService {
                 .collect(Collectors.toList());
     }
 
-    public List<PurchaseOrderResponseDTO> findByStation(UUID stationId) {
-        return purchaseOrderRepository.findByStationId(stationId).stream()
-                .peek(order -> order.setItems(purchaseOrderItemRepository.findByPurchaseOrderId(order.getId())))
-                .map(purchaseOrderMapper::toResponseDTO)
-                .collect(Collectors.toList());
-    }
-
     @Transactional
     public PurchaseOrderResponseDTO update(PurchaseOrderInputDTO inputDTO) {
-        UUID id = inputDTO.getId();
-        PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(id)
-                .orElseThrow(() -> new NotFoundBusinessException(String.format("Purchase order with ID %s not found", id)));
+        try {
+            UUID id = inputDTO.getId();
+            PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Pedido de compra com ID %s não encontrado", id)));
 
-        if (inputDTO == null) {
-            throw new BusinessException("Purchase order payload is required.");
-        }
+            if (inputDTO == null) {
+                throw new BusinessException("O payload do pedido de compra é obrigatório.");
+            }
 
-        if (inputDTO.getNumber() != null && !inputDTO.getNumber().isBlank()) {
-            purchaseOrder.setNumber(inputDTO.getNumber());
-        }
-        if (inputDTO.getOrderedAt() != null) {
-            purchaseOrder.setOrderedAt(inputDTO.getOrderedAt());
-        }
-        if (inputDTO.getExpectedAt() != null) {
-            purchaseOrder.setExpectedAt(inputDTO.getExpectedAt());
-        }
-        if (inputDTO.getStatus() != null && !inputDTO.getStatus().isBlank()) {
-            purchaseOrder.setStatus(inputDTO.getStatus());
-        }
+            if (inputDTO.getNumber() != null && !inputDTO.getNumber().isBlank()) {
+                purchaseOrder.setNumber(inputDTO.getNumber());
+            }
+            if (inputDTO.getOrderedAt() != null) {
+                purchaseOrder.setOrderedAt(inputDTO.getOrderedAt());
+            }
+            if (inputDTO.getExpectedAt() != null) {
+                purchaseOrder.setExpectedAt(inputDTO.getExpectedAt());
+            }
+            if (inputDTO.getStatus() != null && !inputDTO.getStatus().isBlank()) {
+                purchaseOrder.setStatus(inputDTO.getStatus());
+            }
 
-        return purchaseOrderMapper.toResponseDTO(purchaseOrderRepository.saveAndFlush(purchaseOrder));
+            PurchaseOrder saved = purchaseOrderRepository.saveAndFlush(purchaseOrder);
+
+            if (inputDTO.getItems() != null) {
+                // replace items using service
+                purchaseOrderItemService.replaceByPurchaseOrder(saved, inputDTO.getItems());
+                saved.setItems(purchaseOrderItemRepository.findByPurchaseOrderId(saved.getId()));
+            }
+
+            return purchaseOrderMapper.toResponseDTO(saved);
+        } catch (jakarta.validation.ConstraintViolationException exception) {
+            throw new BusinessException(exception.getConstraintViolations().stream()
+                    .map(v -> v.getMessage())
+                    .toList()
+                    .toString());
+        } catch (NotFoundBusinessException exception) {
+            throw exception;
+        } catch (Exception e) {
+            throw new BusinessException("Erro ao atualizar pedido de compra", e);
+        }
     }
 
     @Transactional
@@ -162,7 +174,7 @@ public class PurchaseOrderService {
     public PurchaseOrderResponseDTO cancel(UUID id) {
         PurchaseOrder purchaseOrder = getRequiredEntity(id);
         if (!List.of(PurchaseOrder.Status.DRAFT, PurchaseOrder.Status.APPROVED, PurchaseOrder.Status.SENT).contains(purchaseOrder.getStatus())) {
-            throw new BusinessException("Only draft, approved or sent orders can be canceled.");
+            throw new BusinessException("Apenas pedidos em rascunho, aprovados ou enviados podem ser cancelados.");
         }
         purchaseOrder.setStatus(PurchaseOrder.Status.CANCELED);
         return purchaseOrderMapper.toResponseDTO(purchaseOrderRepository.saveAndFlush(purchaseOrder));
@@ -176,7 +188,7 @@ public class PurchaseOrderService {
 
     private PurchaseOrder getRequiredEntity(UUID id) {
         return purchaseOrderRepository.findById(id)
-                .orElseThrow(() -> new NotFoundBusinessException(String.format("Purchase order with ID %s not found", id)));
+                .orElseThrow(() -> new NotFoundBusinessException(String.format("Pedido de compra com ID %s não encontrado", id)));
     }
 
     private void saveItemsForPurchaseOrder(UUID purchaseOrderId, List<PurchaseOrderItemInputDTO> items) {
@@ -194,31 +206,28 @@ public class PurchaseOrderService {
 
     private void validateCreate(PurchaseOrderInputDTO inputDTO) {
         if (inputDTO == null) {
-            throw new BusinessException("Purchase order payload is required.");
-        }
-        if (inputDTO.getStationId() == null) {
-            throw new BusinessException("Station ID is required.");
+            throw new BusinessException("O payload do pedido de compra é obrigatório.");
         }
         if (inputDTO.getSupplierId() == null) {
-            throw new BusinessException("Supplier ID is required.");
+            throw new BusinessException("O ID do fornecedor é obrigatório.");
         }
         if (inputDTO.getCreatedBy() == null) {
-            throw new BusinessException("Created by is required.");
+            throw new BusinessException("O usuário criador é obrigatório.");
         }
         if (inputDTO.getNumber() == null || inputDTO.getNumber().isBlank()) {
-            throw new BusinessException("Purchase order number is required.");
+            throw new BusinessException("O número do pedido de compra é obrigatório.");
         }
         if (inputDTO.getExpectedAt() == null) {
-            throw new BusinessException("Expected date is required.");
+            throw new BusinessException("A data prevista é obrigatória.");
         }
         if (inputDTO.getItems() == null || inputDTO.getItems().isEmpty()) {
-            throw new BusinessException("Purchase order must contain at least one item.");
+            throw new BusinessException("O pedido de compra deve conter pelo menos um item.");
         }
     }
 
     private void validateStatusTransition(PurchaseOrder purchaseOrder, String expectedStatus, String nextStatus) {
         if (!Objects.equals(purchaseOrder.getStatus(), expectedStatus)) {
-            throw new BusinessException(String.format("Purchase order can only move from %s to %s.", expectedStatus, nextStatus));
+            throw new BusinessException(String.format("O pedido de compra só pode mudar de %s para %s.", expectedStatus, nextStatus));
         }
     }
 }

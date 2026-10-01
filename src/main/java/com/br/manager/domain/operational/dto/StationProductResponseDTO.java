@@ -5,7 +5,6 @@ import java.util.UUID;
 
 public class StationProductResponseDTO {
     private UUID id;
-    private UUID stationId;
     private UUID productId;
     private BigDecimal minStock;
     private BigDecimal reorderPoint;
@@ -13,8 +12,6 @@ public class StationProductResponseDTO {
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
-    public UUID getStationId() { return stationId; }
-    public void setStationId(UUID stationId) { this.stationId = stationId; }
     public UUID getProductId() { return productId; }
     public void setProductId(UUID productId) { this.productId = productId; }
     public BigDecimal getMinStock() { return minStock; }

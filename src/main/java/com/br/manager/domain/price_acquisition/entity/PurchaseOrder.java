@@ -26,14 +26,9 @@ public class PurchaseOrder {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    @NotNull(message = "Station is required.")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "station_id", nullable = false)
-    private Station station;
 
     @NotNull(message = "Supplier is required.")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -70,14 +65,6 @@ public class PurchaseOrder {
 
     public void setId(UUID id) {
         this.id = id;
-    }
-
-    public Station getStation() {
-        return station;
-    }
-
-    public void setStation(Station station) {
-        this.station = station;
     }
 
     public Supplier getSupplier() {
@@ -127,6 +114,7 @@ public class PurchaseOrder {
     public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;
     }
+
 
     public List<PurchaseOrderItem> getItems() {
         return items;

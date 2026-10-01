@@ -7,6 +7,7 @@ import com.br.manager.domain.operational.dto.SupplierResponseDTO;
 import com.br.manager.domain.operational.entity.Supplier;
 import com.br.manager.domain.operational.mapper.SupplierMapper;
 import com.br.manager.domain.operational.repository.SupplierRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class SupplierService {
     @Autowired private SupplierRepository supplierRepository;
     @Autowired private SupplierMapper supplierMapper;
@@ -23,24 +25,23 @@ public class SupplierService {
     public SupplierResponseDTO create(SupplierInputDTO inputDTO) {
         try {
             Supplier entity = supplierMapper.supplierInputDTOToSupplier(inputDTO);
-            if (entity.getId() == null) { entity.setId(UUID.randomUUID()); }
             return supplierMapper.supplierToSupplierResponseDTO(supplierRepository.saveAndFlush(entity));
         } catch (ConstraintViolationException e) {
             throw new BusinessException(e.getConstraintViolations().stream().map(v -> v.getMessage()).toList().toString());
         } catch (Exception e) {
-            throw new BusinessException("Error while saving supplier", e);
+            throw new BusinessException("Erro ao salvar fornecedor", e);
         }
     }
 
     public SupplierResponseDTO update(SupplierInputDTO inputDTO) {
         try {
             Supplier entity = supplierRepository.findByIdAndActiveTrue(inputDTO.getId());
-            if (entity == null) { throw new NotFoundBusinessException(String.format("Supplier with ID %s not found", inputDTO.getId())); }
+            if (entity == null) { throw new NotFoundBusinessException(String.format("Fornecedor com ID %s não encontrado", inputDTO.getId())); }
             supplierMapper.updateSupplierFromDto(inputDTO, entity);
             return supplierMapper.supplierToSupplierResponseDTO(supplierRepository.saveAndFlush(entity));
         } catch (ConstraintViolationException e) {
             throw new BusinessException(e.getConstraintViolations().stream().map(v -> v.getMessage()).toList().toString());
-        } catch (NotFoundBusinessException e) { throw e; } catch (Exception e) { throw new BusinessException("Error while updating supplier", e); }
+        } catch (NotFoundBusinessException e) { throw e; } catch (Exception e) { throw new BusinessException("Erro ao atualizar fornecedor", e); }
     }
 
     public List<SupplierResponseDTO> findAll() { return supplierMapper.listSupplierToListSupplierResponseDTO(supplierRepository.findAllByActiveTrue()); }
@@ -52,12 +53,12 @@ public class SupplierService {
 
     public SupplierResponseDTO find(UUID id) {
         Supplier entity = supplierRepository.findByIdAndActiveTrue(id);
-        if (entity == null) throw new NotFoundBusinessException(String.format("Supplier with ID %s not found", id));
+        if (entity == null) throw new NotFoundBusinessException(String.format("Fornecedor com ID %s não encontrado", id));
         return supplierMapper.supplierToSupplierResponseDTO(entity);
     }
 
     public void delete(UUID id) {
-        Supplier entity = supplierRepository.findById(id).orElseThrow(() -> new NotFoundBusinessException(String.format("Supplier with ID %s not found", id)));
+        Supplier entity = supplierRepository.findById(id).orElseThrow(() -> new NotFoundBusinessException(String.format("Fornecedor com ID %s não encontrado", id)));
         entity.setActive(false);
         supplierRepository.saveAndFlush(entity);
     }

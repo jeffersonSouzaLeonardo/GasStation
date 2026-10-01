@@ -4,7 +4,6 @@ import java.util.UUID;
 
 public class SupplierInputDTO {
     private UUID id;
-    private UUID companyId;
     private String legalName;
     private String cnpjCpf;
     private String stateRegistration;
@@ -21,8 +20,6 @@ public class SupplierInputDTO {
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
-    public UUID getCompanyId() { return companyId; }
-    public void setCompanyId(UUID companyId) { this.companyId = companyId; }
     public String getLegalName() { return legalName; }
     public void setLegalName(String legalName) { this.legalName = legalName; }
     public String getCnpjCpf() { return cnpjCpf; }

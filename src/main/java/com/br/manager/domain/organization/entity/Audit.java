@@ -18,22 +18,18 @@ public class Audit {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @NotNull(message = "Company ID is required.")
-    @Column(name = "company_id", nullable = false)
-    private UUID companyId;
-
     @Column(name = "user_id")
     private UUID userId;
 
-    @NotBlank(message = "Entity name is required.")
+    @NotBlank(message = "O nome da entidade é obrigatório.")
     @Column(name = "entity_name", nullable = false, length = 100)
     private String entityName;
 
-    @NotBlank(message = "Entity ID is required.")
+    @NotBlank(message = "O ID da entidade é obrigatório.")
     @Column(name = "entity_id", nullable = false, length = 100)
     private String entityId;
 
-    @NotBlank(message = "Action is required.")
+    @NotBlank(message = "A ação é obrigatória.")
     @Column(name = "action", nullable = false, length = 50)
     private String action;
 
@@ -46,7 +42,7 @@ public class Audit {
     @Column(name = "ip_address", length = 45)
     private String ipAddress;
 
-    @NotNull(message = "Created at is required.")
+    @NotNull(message = "A data de criação é obrigatória.")
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
@@ -56,14 +52,6 @@ public class Audit {
 
     public void setId(UUID id) {
         this.id = id;
-    }
-
-    public UUID getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(UUID companyId) {
-        this.companyId = companyId;
     }
 
     public UUID getUserId() {

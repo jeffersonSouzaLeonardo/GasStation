@@ -9,13 +9,12 @@ import org.mapstruct.MappingTarget;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface FuelMapper {
+public abstract class FuelMapper {
+    public abstract Fuel fuelInputToFuelEntity(FuelInputDTO inputDTO);
 
-    Fuel fuelInputToFuelEntity(FuelInputDTO inputDTO);
+    public abstract FuelResponseDTO fuelEntityToFuelResponseDTO(Fuel fuel);
 
-    FuelResponseDTO fuelEntityToFuelResponseDTO(Fuel fuel);
+    public abstract List<FuelResponseDTO> listFuelEntityToListFuelResponseDTO(List<Fuel> fuel);
 
-    List<FuelResponseDTO> listFuelEntityToListFuelResponseDTO(List<Fuel> fuel);
-
-    void updateFuelFromDto(FuelInputDTO dto, @MappingTarget Fuel entity);
+    public abstract void updateFuelFromDto(FuelInputDTO dto, @MappingTarget Fuel entity);
 }

@@ -9,13 +9,13 @@ import org.mapstruct.MappingTarget;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper {
+public abstract class UserMapper {
 
-    User userInputDTOToUser(UserInputDTO inputDTO);
+    public abstract User userInputDTOToUser(UserInputDTO inputDTO);
 
-    UserResponseDTO userToUserResponseDTO(User user);
+    public abstract UserResponseDTO userToUserResponseDTO(User user);
 
-    List<UserResponseDTO> listUserToListUserResponseDTO(List<User> users);
+    public abstract List<UserResponseDTO> listUserToListUserResponseDTO(List<User> users);
 
-    void updateUserFromDto(UserInputDTO dto, @MappingTarget User entity);
+    public abstract void updateUserFromDto(UserInputDTO dto, @MappingTarget User entity);
 }

@@ -28,9 +28,6 @@ public class UserLinkService {
     public UserLinkResponseDTO create(UserLinkInputDTO inputDTO) {
         try {
             UserLink userLink = userLinkMapper.userLinkInputDTOToUserLink(inputDTO);
-            if (userLink.getId() == null) {
-                userLink.setId(UUID.randomUUID());
-            }
             return userLinkMapper.userLinkToUserLinkResponseDTO(userLinkRepository.saveAndFlush(userLink));
         } catch (ConstraintViolationException exception) {
             throw new BusinessException(exception.getConstraintViolations().stream()
@@ -39,7 +36,7 @@ public class UserLinkService {
                     .toString());
         } catch (Exception e) {
             String role = inputDTO != null && inputDTO.getRole() != null ? inputDTO.getRole().name() : "";
-            throw new BusinessException("Error while saving user-link " + role, e);
+            throw new BusinessException("Erro ao salvar vínculo de usuário " + role, e);
         }
     }
 
@@ -47,7 +44,7 @@ public class UserLinkService {
         try {
             UserLink userLink = userLinkRepository.findByIdAndActiveTrue(inputDTO.getId());
             if (userLink == null) {
-                throw new NotFoundBusinessException(String.format("User link with ID %s not found", inputDTO.getId()));
+                throw new NotFoundBusinessException(String.format("Vínculo de usuário com ID %s não encontrado", inputDTO.getId()));
             }
             userLinkMapper.updateUserLinkFromDto(inputDTO, userLink);
             return userLinkMapper.userLinkToUserLinkResponseDTO(userLinkRepository.saveAndFlush(userLink));
@@ -60,7 +57,7 @@ public class UserLinkService {
             throw e;
         } catch (Exception e) {
             String role = inputDTO != null && inputDTO.getRole() != null ? inputDTO.getRole().name() : "";
-            throw new BusinessException("Error while saving user-link " + role, e);
+            throw new BusinessException("Erro ao salvar vínculo de usuário " + role, e);
         }
     }
 
@@ -87,7 +84,7 @@ public class UserLinkService {
     public UserLinkResponseDTO find(UUID id) {
         UserLink userLink = userLinkRepository.findByIdAndActiveTrue(id);
         if (userLink == null) {
-            throw new NotFoundBusinessException(String.format("User link with ID %s not found", id));
+            throw new NotFoundBusinessException(String.format("Vínculo de usuário com ID %s não encontrado", id));
         }
         return userLinkMapper.userLinkToUserLinkResponseDTO(userLink);
     }
@@ -95,7 +92,7 @@ public class UserLinkService {
     public void delete(UUID id) {
         try {
             UserLink userLink = userLinkRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("User link with ID %s not found", id)));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Vínculo de usuário com ID %s não encontrado", id)));
             userLink.setActive(false);
             userLinkRepository.saveAndFlush(userLink);
         } catch (ConstraintViolationException exception) {
@@ -106,14 +103,14 @@ public class UserLinkService {
         } catch (NotFoundBusinessException e) {
             throw e;
         } catch (Exception e) {
-            throw new BusinessException("Error while deleting user-link", e);
+            throw new BusinessException("Erro ao excluir vínculo de usuário", e);
         }
     }
 
     public UserLink getUserLinkEntityById(UUID id) {
         UserLink userLink = userLinkRepository.findByIdAndActiveTrue(id);
         if (userLink == null) {
-            throw new NotFoundBusinessException(String.format("User link with ID %s not found", id));
+            throw new NotFoundBusinessException(String.format("Vínculo de usuário com ID %s não encontrado", id));
         }
         return userLink;
     }

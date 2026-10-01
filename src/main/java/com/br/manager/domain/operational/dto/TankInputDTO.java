@@ -5,7 +5,6 @@ import java.util.UUID;
 
 public class TankInputDTO {
     private UUID id;
-    private UUID stationId;
     private String code;
     private UUID productId;
     private BigDecimal capacityLiters;
@@ -15,8 +14,6 @@ public class TankInputDTO {
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
-    public UUID getStationId() { return stationId; }
-    public void setStationId(UUID stationId) { this.stationId = stationId; }
     public String getCode() { return code; }
     public void setCode(String code) { this.code = code; }
     public UUID getProductId() { return productId; }

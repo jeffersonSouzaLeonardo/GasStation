@@ -7,6 +7,7 @@ import com.br.manager.domain.operational.dto.CustomerResponseDTO;
 import com.br.manager.domain.operational.entity.Customer;
 import com.br.manager.domain.operational.mapper.CustomerMapper;
 import com.br.manager.domain.operational.repository.CustomerRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class CustomerService {
     @Autowired private CustomerRepository customerRepository;
     @Autowired private CustomerMapper customerMapper;
@@ -23,24 +25,23 @@ public class CustomerService {
     public CustomerResponseDTO create(CustomerInputDTO inputDTO) {
         try {
             Customer entity = customerMapper.customerInputDTOToCustomer(inputDTO);
-            if (entity.getId() == null) { entity.setId(UUID.randomUUID()); }
-            return customerMapper.customerToCustomerResponseDTO(customerRepository.saveAndFlush(entity));
+                        return customerMapper.customerToCustomerResponseDTO(customerRepository.saveAndFlush(entity));
         } catch (ConstraintViolationException e) {
             throw new BusinessException(e.getConstraintViolations().stream().map(v -> v.getMessage()).toList().toString());
         } catch (Exception e) {
-            throw new BusinessException("Error while saving customer", e);
+            throw new BusinessException("Erro ao salvar cliente", e);
         }
     }
 
     public CustomerResponseDTO update(CustomerInputDTO inputDTO) {
         try {
             Customer entity = customerRepository.findByIdAndActiveTrue(inputDTO.getId());
-            if (entity == null) { throw new NotFoundBusinessException(String.format("Customer with ID %s not found", inputDTO.getId())); }
+            if (entity == null) { throw new NotFoundBusinessException(String.format("Cliente com ID %s não encontrado", inputDTO.getId())); }
             customerMapper.updateCustomerFromDto(inputDTO, entity);
             return customerMapper.customerToCustomerResponseDTO(customerRepository.saveAndFlush(entity));
         } catch (ConstraintViolationException e) {
             throw new BusinessException(e.getConstraintViolations().stream().map(v -> v.getMessage()).toList().toString());
-        } catch (NotFoundBusinessException e) { throw e; } catch (Exception e) { throw new BusinessException("Error while updating customer", e); }
+        } catch (NotFoundBusinessException e) { throw e; } catch (Exception e) { throw new BusinessException("Erro ao atualizar cliente", e); }
     }
 
     public List<CustomerResponseDTO> findAll() { return customerMapper.listCustomerToListCustomerResponseDTO(customerRepository.findAllByActiveTrue()); }
@@ -52,12 +53,12 @@ public class CustomerService {
 
     public CustomerResponseDTO find(UUID id) {
         Customer entity = customerRepository.findByIdAndActiveTrue(id);
-        if (entity == null) throw new NotFoundBusinessException(String.format("Customer with ID %s not found", id));
+        if (entity == null) throw new NotFoundBusinessException(String.format("Cliente com ID %s não encontrado", id));
         return customerMapper.customerToCustomerResponseDTO(entity);
     }
 
     public void delete(UUID id) {
-        Customer entity = customerRepository.findById(id).orElseThrow(() -> new NotFoundBusinessException(String.format("Customer with ID %s not found", id)));
+        Customer entity = customerRepository.findById(id).orElseThrow(() -> new NotFoundBusinessException(String.format("Cliente com ID %s não encontrado", id)));
         entity.setActive(false);
         customerRepository.saveAndFlush(entity);
     }

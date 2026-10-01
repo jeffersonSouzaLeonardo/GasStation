@@ -9,12 +9,12 @@ import org.mapstruct.MappingTarget;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface NozzleMapper {
-    Nozzle nozzleInputDTOToNozzle(NozzleInputDTO inputDTO);
+public abstract class NozzleMapper {
+    public abstract Nozzle nozzleInputDTOToNozzle(NozzleInputDTO inputDTO);
 
-    NozzleResponseDTO nozzleToNozzleResponseDTO(Nozzle entity);
+    public abstract NozzleResponseDTO nozzleToNozzleResponseDTO(Nozzle entity);
 
-    List<NozzleResponseDTO> listNozzleToListNozzleResponseDTO(List<Nozzle> entities);
+    public abstract List<NozzleResponseDTO> listNozzleToListNozzleResponseDTO(List<Nozzle> entities);
 
-    void updateNozzleFromDto(NozzleInputDTO dto, @MappingTarget Nozzle entity);
+    public abstract void updateNozzleFromDto(NozzleInputDTO dto, @MappingTarget Nozzle entity);
 }

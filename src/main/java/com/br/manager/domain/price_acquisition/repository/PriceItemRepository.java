@@ -15,4 +15,6 @@ public interface PriceItemRepository extends JpaRepository<PriceItem, UUID> {
     PriceItem findByIdAndActiveTrue(UUID id);
 
     List<PriceItem> findByPriceTableIdAndActiveTrue(UUID priceTableId);
+
+    void deleteByPriceTable(PriceTable priceTable);
 }

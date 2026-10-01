@@ -13,8 +13,6 @@ import java.util.UUID;
 public interface AuditRepository extends JpaRepository<Audit, UUID> {
     List<Audit> findAllByOrderByCreatedAtDesc();
 
-    Audit findByIdAndCompanyId(UUID id, UUID companyId);
-
     @Query("SELECT a FROM Audit a WHERE a.entityName LIKE %:text% ORDER BY a.createdAt DESC")
     List<Audit> findByEntityNameContainingIgnoreCaseAndOrderByCreatedAtDesc(@Param("text") String text);
 }

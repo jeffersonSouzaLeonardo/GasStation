@@ -7,7 +7,6 @@ import java.util.UUID;
 public class PurchaseOrderInputDTO {
 
     private UUID id;
-    private UUID stationId;
     private UUID supplierId;
     private String number;
     private String status;
@@ -22,14 +21,6 @@ public class PurchaseOrderInputDTO {
 
     public void setId(UUID id) {
         this.id = id;
-    }
-
-    public UUID getStationId() {
-        return stationId;
-    }
-
-    public void setStationId(UUID stationId) {
-        this.stationId = stationId;
     }
 
     public UUID getSupplierId() {

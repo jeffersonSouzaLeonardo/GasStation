@@ -20,7 +20,7 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Aplica a todos os endpoints
                         .allowedOriginPatterns("http://localhost:*") // Substitua pela URL do seu front
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH") // Libera os métodos HTTP
                         .allowedHeaders("Content-Type", "x-tenant-id") // Libera os headers específicos
                         .exposedHeaders("x-tenant-id") // Permite que o front leia o header na resposta, se necessário
                         .allowCredentials(true);

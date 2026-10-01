@@ -29,6 +29,11 @@ public class ProductController {
         return ResponseEntity.ok(productService.findAll());
     }
 
+    @GetMapping("/fuel")
+    public ResponseEntity<List<ProductResponseDTO>> getAllFuel() {
+        return ResponseEntity.ok(productService.findProductTypeFuel());
+    }
+
     @GetMapping("/search")
     public ResponseEntity<List<ProductResponseDTO>> searchByDescription(@RequestParam String description) {
         return ResponseEntity.ok(productService.findByDescription(description));

@@ -6,7 +6,6 @@ import java.util.UUID;
 
 public class PaymentMethodInputDTO {
     private UUID id;
-    private UUID companyId;
     private String name;
     private PaymentMethodKindEnum kind;
     private Boolean requiresReference = false;
@@ -15,8 +14,6 @@ public class PaymentMethodInputDTO {
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
-    public UUID getCompanyId() { return companyId; }
-    public void setCompanyId(UUID companyId) { this.companyId = companyId; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public PaymentMethodKindEnum getKind() { return kind; }

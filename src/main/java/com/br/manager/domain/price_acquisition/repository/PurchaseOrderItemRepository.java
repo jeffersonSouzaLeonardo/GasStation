@@ -1,5 +1,6 @@
 package com.br.manager.domain.price_acquisition.repository;
 
+import com.br.manager.domain.price_acquisition.entity.PurchaseOrder;
 import com.br.manager.domain.price_acquisition.entity.PurchaseOrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,4 +12,6 @@ import java.util.UUID;
 public interface PurchaseOrderItemRepository extends JpaRepository<PurchaseOrderItem, UUID> {
 
     List<PurchaseOrderItem> findByPurchaseOrderId(UUID purchaseOrderId);
+
+    void deleteByPurchaseOrder(PurchaseOrder purchaseOrder);
 }

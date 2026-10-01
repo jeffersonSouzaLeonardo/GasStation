@@ -15,5 +15,4 @@ public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, UU
 
     List<PaymentMethod> findByNameContainingIgnoreCaseAndActiveTrue(String name);
 
-    List<PaymentMethod> findByCompanyIdAndActiveTrue(UUID companyId);
 }

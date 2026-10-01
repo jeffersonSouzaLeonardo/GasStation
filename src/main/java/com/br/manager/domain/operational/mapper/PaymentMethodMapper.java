@@ -9,12 +9,12 @@ import org.mapstruct.MappingTarget;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface PaymentMethodMapper {
-    PaymentMethod paymentMethodInputDTOToPaymentMethod(PaymentMethodInputDTO inputDTO);
+public abstract class PaymentMethodMapper {
+    public abstract PaymentMethod paymentMethodInputDTOToPaymentMethod(PaymentMethodInputDTO inputDTO);
 
-    PaymentMethodResponseDTO paymentMethodToPaymentMethodResponseDTO(PaymentMethod entity);
+    public abstract PaymentMethodResponseDTO paymentMethodToPaymentMethodResponseDTO(PaymentMethod entity);
 
-    List<PaymentMethodResponseDTO> listPaymentMethodToListPaymentMethodResponseDTO(List<PaymentMethod> entities);
+    public abstract List<PaymentMethodResponseDTO> listPaymentMethodToListPaymentMethodResponseDTO(List<PaymentMethod> entities);
 
-    void updatePaymentMethodFromDto(PaymentMethodInputDTO dto, @MappingTarget PaymentMethod entity);
+    public abstract void updatePaymentMethodFromDto(PaymentMethodInputDTO dto, @MappingTarget PaymentMethod entity);
 }

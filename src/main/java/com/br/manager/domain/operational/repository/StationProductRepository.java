@@ -13,7 +13,5 @@ public interface StationProductRepository extends JpaRepository<StationProduct, 
 
     StationProduct findByIdAndActiveTrue(UUID id);
 
-    List<StationProduct> findByStationIdAndActiveTrue(UUID stationId);
-
     List<StationProduct> findByProductIdAndActiveTrue(UUID productId);
 }

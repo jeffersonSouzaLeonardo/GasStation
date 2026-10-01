@@ -15,5 +15,4 @@ public interface PumpRepository extends JpaRepository<Pump, UUID> {
 
     List<Pump> findByCodeContainingIgnoreCaseAndActiveTrue(String code);
 
-    List<Pump> findByStationIdAndActiveTrue(UUID stationId);
 }

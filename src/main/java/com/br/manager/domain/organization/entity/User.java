@@ -19,23 +19,23 @@ public class User {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @NotBlank(message = "User name is required.")
+    @NotBlank(message = "O nome do usuário é obrigatório.")
     @Column(name = "name", nullable = false)
     private String name;
 
-    @NotBlank(message = "User email is required.")
-    @Email(message = "Invalid email format.")
+    @NotBlank(message = "O e-mail do usuário é obrigatório.")
+    @Email(message = "Formato de e-mail inválido.")
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @NotBlank(message = "Password hash is required.")
+    @NotBlank(message = "O hash da senha é obrigatório.")
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @NotNull(message = "Active flag is required.")
+    @NotNull(message = "O campo ativo é obrigatório.")
     @Column(name = "active", nullable = false)
     private Boolean active = true;
 

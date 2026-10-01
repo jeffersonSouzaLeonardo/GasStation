@@ -27,9 +27,6 @@ public class UserService {
     public UserResponseDTO create(UserInputDTO inputDTO) {
         try {
             User user = userMapper.userInputDTOToUser(inputDTO);
-            if (user.getId() == null) {
-                user.setId(UUID.randomUUID());
-            }
             return userMapper.userToUserResponseDTO(userRepository.saveAndFlush(user));
         } catch (ConstraintViolationException exception) {
             throw new BusinessException(exception.getConstraintViolations().stream()
@@ -38,7 +35,7 @@ public class UserService {
                     .toString());
         } catch (Exception e) {
             String name = inputDTO != null && StringUtils.hasText(inputDTO.getName()) ? inputDTO.getName() : "";
-            throw new BusinessException("Error while saving user " + name, e);
+            throw new BusinessException("Erro ao salvar usuário " + name, e);
         }
     }
 
@@ -46,7 +43,7 @@ public class UserService {
         try {
             User user = userRepository.findByIdAndActiveTrue(inputDTO.getId());
             if (user == null) {
-                throw new NotFoundBusinessException(String.format("User with ID %s not found", inputDTO.getId()));
+                throw new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", inputDTO.getId()));
             }
             userMapper.updateUserFromDto(inputDTO, user);
             return userMapper.userToUserResponseDTO(userRepository.saveAndFlush(user));
@@ -59,7 +56,7 @@ public class UserService {
             throw e;
         } catch (Exception e) {
             String name = inputDTO != null && StringUtils.hasText(inputDTO.getName()) ? inputDTO.getName() : "";
-            throw new BusinessException("Error while saving user " + name, e);
+            throw new BusinessException("Erro ao salvar usuário " + name, e);
         }
     }
 
@@ -81,9 +78,9 @@ public class UserService {
 
     public UserResponseDTO find(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundBusinessException(String.format("User with ID %s not found", id)));
+                .orElseThrow(() -> new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", id)));
         if (!Boolean.TRUE.equals(user.getActive())) {
-            throw new NotFoundBusinessException(String.format("User with ID %s not found", id));
+            throw new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", id));
         }
         return userMapper.userToUserResponseDTO(user);
     }
@@ -91,7 +88,7 @@ public class UserService {
     public void delete(UUID id) {
         try {
             User user = userRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("User with ID %s not found", id)));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", id)));
             user.setActive(false);
             userRepository.saveAndFlush(user);
         } catch (ConstraintViolationException exception) {
@@ -102,15 +99,15 @@ public class UserService {
         } catch (NotFoundBusinessException e) {
             throw e;
         } catch (Exception e) {
-            throw new BusinessException("Error while deleting user", e);
+            throw new BusinessException("Erro ao excluir usuário", e);
         }
     }
 
     public User getUserEntityById(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundBusinessException(String.format("User with ID %s not found", id)));
+                .orElseThrow(() -> new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", id)));
         if (!Boolean.TRUE.equals(user.getActive())) {
-            throw new NotFoundBusinessException(String.format("User with ID %s not found", id));
+            throw new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", id));
         }
         return user;
     }

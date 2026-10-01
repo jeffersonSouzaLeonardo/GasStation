@@ -17,5 +17,4 @@ public interface NozzleRepository extends JpaRepository<Nozzle, UUID> {
 
     List<Nozzle> findByPumpIdAndActiveTrue(UUID pumpId);
 
-    List<Nozzle> findByTankIdAndActiveTrue(UUID tankId);
 }

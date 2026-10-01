@@ -27,9 +27,6 @@ public class StationService {
     public StationResponseDTO create(StationInputDTO inputDTO) {
         try {
             Station station = stationMapper.stationInputDTOToStation(inputDTO);
-            if (station.getId() == null) {
-                station.setId(UUID.randomUUID());
-            }
             if (!StringUtils.hasText(station.getTimezone())) {
                 station.setTimezone("America/Sao_Paulo");
             }
@@ -41,7 +38,7 @@ public class StationService {
                     .toString());
         } catch (Exception e) {
             String name = inputDTO != null && StringUtils.hasText(inputDTO.getName()) ? inputDTO.getName() : "";
-            throw new BusinessException("Error while saving station " + name, e);
+            throw new BusinessException("Erro ao salvar posto " + name, e);
         }
     }
 
@@ -49,7 +46,7 @@ public class StationService {
         try {
             Station station = stationRepository.findByIdAndActiveTrue(inputDTO.getId());
             if (station == null) {
-                throw new NotFoundBusinessException(String.format("Station with ID %s not found", inputDTO.getId()));
+                throw new NotFoundBusinessException(String.format("Posto com ID %s não encontrado", inputDTO.getId()));
             }
             stationMapper.updateStationFromDto(inputDTO, station);
             return stationMapper.stationToStationResponseDTO(stationRepository.saveAndFlush(station));
@@ -62,7 +59,7 @@ public class StationService {
             throw e;
         } catch (Exception e) {
             String name = inputDTO != null && StringUtils.hasText(inputDTO.getName()) ? inputDTO.getName() : "";
-            throw new BusinessException("Error while saving station " + name, e);
+            throw new BusinessException("Erro ao salvar posto " + name, e);
         }
     }
 
@@ -85,7 +82,7 @@ public class StationService {
     public StationResponseDTO find(UUID id) {
         Station station = stationRepository.findByIdAndActiveTrue(id);
         if (station == null) {
-            throw new NotFoundBusinessException(String.format("Station with ID %s not found", id));
+            throw new NotFoundBusinessException(String.format("Posto com ID %s não encontrado", id));
         }
         return stationMapper.stationToStationResponseDTO(station);
     }
@@ -93,7 +90,7 @@ public class StationService {
     public void delete(UUID id) {
         try {
             Station station = stationRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Station with ID %s not found", id)));
+                    .orElseThrow(() -> new NotFoundBusinessException(String.format("Posto com ID %s não encontrado", id)));
             station.setActive(false);
             stationRepository.saveAndFlush(station);
         } catch (ConstraintViolationException exception) {
@@ -104,14 +101,14 @@ public class StationService {
         } catch (NotFoundBusinessException e) {
             throw e;
         } catch (Exception e) {
-            throw new BusinessException("Error while deleting station", e);
+            throw new BusinessException("Erro ao excluir posto", e);
         }
     }
 
     public Station getStationEntityById(UUID id) {
         Station station = stationRepository.findByIdAndActiveTrue(id);
         if (station == null) {
-            throw new NotFoundBusinessException(String.format("Station with ID %s not found", id));
+            throw new NotFoundBusinessException(String.format("Posto com ID %s não encontrado", id));
         }
         return station;
     }
