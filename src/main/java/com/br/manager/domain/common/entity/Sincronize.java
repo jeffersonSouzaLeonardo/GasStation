@@ -2,9 +2,11 @@ package com.br.manager.domain.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,7 +18,8 @@ public class Sincronize {
     @Id
     private UUID id;
 
-    @NotBlank(message = "O nome da tabela é obrigatório.")
+    @NotNull(message = "O nome da tabela é obrigatório.")
+    @Enumerated(EnumType.STRING)
     @Column(name = "name", nullable = false)
     private SincronizeNameTableEnum nameTable;
 

@@ -1,14 +1,14 @@
 package com.br.manager.domain.common.entity;
 
 public enum SincronizeNameTableEnum {
-    USER("users"),
-    COMPANY("companies"),
-    STATION("stations");
+    USER,
+    COMPANY,
+    STATION;
 
     private final String tableName;
 
-    SincronizeNameTableEnum(String tableName) {
-        this.tableName = tableName;
+    SincronizeNameTableEnum() {
+        this.tableName = name().toLowerCase();
     }
 
     public String getTableName() {

@@ -32,8 +32,9 @@ public class SincronizeService {
             throw new NotFoundBusinessException(String.format("Nome da tabela inválido: %s", tableName));
         }
 
-        return sincronizeRepository.findByNameTable(enumValue)
+        var sincronize = sincronizeRepository.findByNameTable(enumValue)
                 .orElseThrow(() -> new NotFoundBusinessException(String.format("Sincronize para tabela %s não encontrada", tableName)));
+        return sincronize;
     }
 
     public Sincronize update(SincronizeDTO sincronizeDTO) {
