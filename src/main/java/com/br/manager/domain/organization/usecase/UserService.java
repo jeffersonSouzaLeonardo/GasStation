@@ -2,6 +2,7 @@ package com.br.manager.domain.organization.usecase;
 
 import com.br.manager.domain.common.exception.BusinessException;
 import com.br.manager.domain.common.exception.NotFoundBusinessException;
+import com.br.manager.domain.common.service.SincronizeService;
 import com.br.manager.domain.organization.dto.UserInputDTO;
 import com.br.manager.domain.organization.dto.UserResponseDTO;
 import com.br.manager.domain.organization.entity.User;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +25,9 @@ public class UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private SincronizeService sincronizeService;
 
     public UserResponseDTO create(UserInputDTO inputDTO) {
         try {
@@ -90,6 +95,7 @@ public class UserService {
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", id)));
             user.setActive(false);
+            user.setDeletedAt(LocalDateTime.now());
             userRepository.saveAndFlush(user);
         } catch (ConstraintViolationException exception) {
             throw new BusinessException(exception.getConstraintViolations().stream()
@@ -111,4 +117,20 @@ public class UserService {
         }
         return user;
     }
+
+    /**
+     * Retorna usuários criados, atualizados ou deletados após a última sincronização da tabela informada.
+     * Aceita tableName como string que corresponde a um valor do enum SincronizeNameTableEnum (ex: "USER").
+     */
+    public List<UserResponseDTO> findChangedSinceSincronize(String tableName) {
+        var sincronize = sincronizeService.findByTableName(tableName);
+        var since = sincronize.getLastSincronize();
+        if (since == null) {
+            // se não houver data, considerar desde o início para garantir consistência
+            since = LocalDateTime.MIN;
+        }
+        List<User> changed = userRepository.findAllChangedSince(since);
+        return userMapper.listUserToListUserResponseDTO(changed);
+    }
 }
+

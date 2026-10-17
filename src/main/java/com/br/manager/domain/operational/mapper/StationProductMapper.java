@@ -3,18 +3,42 @@ package com.br.manager.domain.operational.mapper;
 import com.br.manager.domain.operational.dto.StationProductInputDTO;
 import com.br.manager.domain.operational.dto.StationProductResponseDTO;
 import com.br.manager.domain.operational.entity.StationProduct;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
-public abstract class StationProductMapper {
-    public abstract StationProduct stationProductInputDTOToStationProduct(StationProductInputDTO inputDTO);
+@Component
+public class StationProductMapper {
+    public StationProduct stationProductInputDTOToStationProduct(StationProductInputDTO inputDTO) {
+        if (inputDTO == null) {
+            return null;
+        }
+        StationProduct entity = new StationProduct();
+        BeanUtils.copyProperties(inputDTO, entity);
+        return entity;
+    }
 
-    public abstract StationProductResponseDTO stationProductToStationProductResponseDTO(StationProduct entity);
+    public StationProductResponseDTO stationProductToStationProductResponseDTO(StationProduct entity) {
+        if (entity == null) {
+            return null;
+        }
+        StationProductResponseDTO dto = new StationProductResponseDTO();
+        BeanUtils.copyProperties(entity, dto);
+        return dto;
+    }
 
-    public abstract List<StationProductResponseDTO> listStationProductToListStationProductResponseDTO(List<StationProduct> entities);
+    public List<StationProductResponseDTO> listStationProductToListStationProductResponseDTO(List<StationProduct> entities) {
+        if (entities == null) {
+            return null;
+        }
+        return entities.stream().map(this::stationProductToStationProductResponseDTO).toList();
+    }
 
-    public abstract void updateStationProductFromDto(StationProductInputDTO dto, @MappingTarget StationProduct entity);
+    public void updateStationProductFromDto(StationProductInputDTO dto, StationProduct entity) {
+        if (dto == null || entity == null) {
+            return;
+        }
+        BeanUtils.copyProperties(dto, entity);
+    }
 }

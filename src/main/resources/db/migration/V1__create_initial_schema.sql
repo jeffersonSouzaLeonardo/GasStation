@@ -60,7 +60,8 @@ CREATE TABLE users (
 
     -- Transversais
                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                       updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP
+                       updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
+                       deleted_at DATETIME
 );
 
 CREATE TABLE user_station_roles (

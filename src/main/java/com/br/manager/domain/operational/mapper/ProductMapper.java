@@ -3,18 +3,42 @@ package com.br.manager.domain.operational.mapper;
 import com.br.manager.domain.operational.dto.ProductInputDTO;
 import com.br.manager.domain.operational.dto.ProductResponseDTO;
 import com.br.manager.domain.operational.entity.Product;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
-public abstract class ProductMapper {
-    public abstract Product productInputDTOToProduct(ProductInputDTO inputDTO);
+@Component
+public class ProductMapper {
+    public Product productInputDTOToProduct(ProductInputDTO inputDTO) {
+        if (inputDTO == null) {
+            return null;
+        }
+        Product entity = new Product();
+        BeanUtils.copyProperties(inputDTO, entity);
+        return entity;
+    }
 
-    public abstract ProductResponseDTO productToProductResponseDTO(Product product);
+    public ProductResponseDTO productToProductResponseDTO(Product product) {
+        if (product == null) {
+            return null;
+        }
+        ProductResponseDTO dto = new ProductResponseDTO();
+        BeanUtils.copyProperties(product, dto);
+        return dto;
+    }
 
-    public abstract List<ProductResponseDTO> listProductToListProductResponseDTO(List<Product> products);
+    public List<ProductResponseDTO> listProductToListProductResponseDTO(List<Product> products) {
+        if (products == null) {
+            return null;
+        }
+        return products.stream().map(this::productToProductResponseDTO).toList();
+    }
 
-    public abstract void updateProductFromDto(ProductInputDTO dto, @MappingTarget Product entity);
+    public void updateProductFromDto(ProductInputDTO dto, Product entity) {
+        if (dto == null || entity == null) {
+            return;
+        }
+        BeanUtils.copyProperties(dto, entity);
+    }
 }

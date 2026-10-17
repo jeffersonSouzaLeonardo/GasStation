@@ -28,7 +28,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAll(@RequestHeader HttpHeaders headers) {
-        return ResponseEntity.ok(userService.findAll());
+        return ResponseEntity.ok(userService.findChangedSinceSincronize("USER"));
     }
 
     @GetMapping("/search")
