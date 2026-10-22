@@ -1,17 +1,17 @@
 -- =============================================================================
--- Flyway Migration: V4__create_sincronize_table.sql
--- Descrição: Criação da tabela sincronize
+-- Flyway Migration: V4__create_synchronize_table.sql
+-- Descrição: Criação da tabela synchronize
 -- =============================================================================
 
-CREATE TABLE IF NOT EXISTS sincronize (
+CREATE TABLE IF NOT EXISTS synchronize (
     id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     name ENUM('USER', 'COMPANY', 'STATION') NOT NULL,
-    last_sincronize DATETIME,
+    last_synchronize DATETIME,
 
     -- Transversais
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP
 );
 
-ALTER TABLE sincronize
-  ADD CONSTRAINT sincronize_name_unique UNIQUE (name);
+ALTER TABLE synchronize
+  ADD CONSTRAINT synchronize_name_unique UNIQUE (name);

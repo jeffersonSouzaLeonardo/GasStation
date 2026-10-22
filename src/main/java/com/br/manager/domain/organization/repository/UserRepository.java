@@ -22,7 +22,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.active = true")
     User findByEmailAndActiveTrue(@Param("email") String email);
 
-    // Busca usuários criados, atualizados ou deletados após a data informada.
-    @Query("SELECT u FROM User u WHERE (u.createdAt > :since OR u.updatedAt > :since OR u.deletedAt > :since)")
+    // Busca usuários criados, atualizados ou deletados após a data informada, ou que nunca foram atualizados (updatedAt nulo).
+    @Query("SELECT u FROM User u WHERE (u.createdAt > :since OR u.updatedAt > :since OR u.deletedAt > :since OR u.updatedAt IS NULL)")
     List<User> findAllChangedSince(@Param("since") LocalDateTime since);
 }

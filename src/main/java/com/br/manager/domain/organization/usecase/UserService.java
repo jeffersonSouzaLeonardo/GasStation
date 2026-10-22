@@ -2,7 +2,7 @@ package com.br.manager.domain.organization.usecase;
 
 import com.br.manager.domain.common.exception.BusinessException;
 import com.br.manager.domain.common.exception.NotFoundBusinessException;
-import com.br.manager.domain.common.service.SincronizeService;
+import com.br.manager.domain.common.service.SynchronizeService;
 import com.br.manager.domain.organization.dto.UserInputDTO;
 import com.br.manager.domain.organization.dto.UserResponseDTO;
 import com.br.manager.domain.organization.entity.User;
@@ -11,6 +11,7 @@ import com.br.manager.domain.organization.repository.UserRepository;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -27,8 +28,9 @@ public class UserService {
     private UserMapper userMapper;
 
     @Autowired
-    private SincronizeService sincronizeService;
+    private SynchronizeService synchronizeService;
 
+    @Transactional
     public UserResponseDTO create(UserInputDTO inputDTO) {
         try {
             User user = userMapper.userInputDTOToUser(inputDTO);
@@ -44,6 +46,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public UserResponseDTO update(UserInputDTO inputDTO) {
         try {
             User user = userRepository.findByIdAndActiveTrue(inputDTO.getId());
@@ -65,10 +68,12 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<UserResponseDTO> findAll() {
         return userMapper.listUserToListUserResponseDTO(userRepository.findAllByActiveTrue());
     }
 
+    @Transactional(readOnly = true)
     public List<UserResponseDTO> findByDescription(String description) {
         if (!StringUtils.hasText(description)) {
             return findAll();
@@ -77,10 +82,12 @@ public class UserService {
                 userRepository.findByNameContainingIgnoreCaseAndActiveTrue(description));
     }
 
+    @Transactional(readOnly = true)
     public List<UserResponseDTO> findByName(String name) {
         return findByDescription(name);
     }
 
+    @Transactional(readOnly = true)
     public UserResponseDTO find(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", id)));
@@ -90,6 +97,7 @@ public class UserService {
         return userMapper.userToUserResponseDTO(user);
     }
 
+    @Transactional
     public void delete(UUID id) {
         try {
             User user = userRepository.findById(id)
@@ -109,6 +117,7 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public User getUserEntityById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", id)));
@@ -122,9 +131,10 @@ public class UserService {
      * Retorna usuários criados, atualizados ou deletados após a última sincronização da tabela informada.
      * Aceita tableName como string que corresponde a um valor do enum SincronizeNameTableEnum (ex: "USER").
      */
-    public List<UserResponseDTO> findChangedSinceSincronize(String tableName) {
-        var sincronize = sincronizeService.findByTableName(tableName);
-        var since = sincronize.getLastSincronize();
+    @Transactional(readOnly = true)
+    public List<UserResponseDTO> findChangedSinceSynchronize(String tableName) {
+        var synchronize = synchronizeService.findByTableName(tableName);
+        var since = synchronize.getLastSynchronize();
         if (since == null) {
             // se não houver data, considerar desde a época Unix para garantir consistência
             since = LocalDateTime.of(1970, 1, 1, 0, 0, 0);

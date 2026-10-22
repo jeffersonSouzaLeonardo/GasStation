@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/user-sincronize")
+@RequestMapping("/user-synchronize")
 public class UserController {
 
     private final String ENTITY_NAME = "USER";
@@ -24,7 +24,9 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAll(@RequestHeader HttpHeaders headers) {
-        return ResponseEntity.ok(userService.findChangedSinceSincronize(ENTITY_NAME));
+        return ResponseEntity.ok(userService.findChangedSinceSynchronize(ENTITY_NAME));
     }
+
+
 
 }

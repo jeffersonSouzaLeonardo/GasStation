@@ -1,4 +1,4 @@
-package com.br.manager.domain.common;
+package com.br.manager.domain.common.dto;
 
 import java.time.LocalDateTime;
 
