@@ -2,6 +2,7 @@ package com.br.manager.domain.operational.usecase;
 
 import com.br.manager.domain.common.exception.BusinessException;
 import com.br.manager.domain.common.exception.NotFoundBusinessException;
+import com.br.manager.domain.common.service.SynchronizeService;
 import com.br.manager.domain.operational.dto.SupplierInputDTO;
 import com.br.manager.domain.operational.dto.SupplierResponseDTO;
 import com.br.manager.domain.operational.entity.Supplier;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +23,7 @@ import java.util.UUID;
 public class SupplierService {
     @Autowired private SupplierRepository supplierRepository;
     @Autowired private SupplierMapper supplierMapper;
+    @Autowired private SynchronizeService synchronizeService;
 
     public SupplierResponseDTO create(SupplierInputDTO inputDTO) {
         try {
@@ -60,6 +63,21 @@ public class SupplierService {
     public void delete(UUID id) {
         Supplier entity = supplierRepository.findById(id).orElseThrow(() -> new NotFoundBusinessException(String.format("Fornecedor com ID %s não encontrado", id)));
         entity.setActive(false);
+        entity.setDeletedAt(LocalDateTime.now());
         supplierRepository.saveAndFlush(entity);
+    }
+
+    /**
+     * Retorna registros criados, atualizados ou deletados após a última sincronização da tabela informada.
+     */
+    public List<SupplierResponseDTO> findChangedSinceSynchronize(String tableName) {
+        var synchronize = synchronizeService.findByTableName(tableName);
+        var since = synchronize.getLastSynchronize();
+        if (since == null) {
+            // se não houver data, considerar desde a época Unix para garantir consistência
+            since = LocalDateTime.of(2026, 1, 1, 0, 0, 0);
+        }
+        List<Supplier> changed = supplierRepository.findAllChangedSince(since);
+        return supplierMapper.listSupplierToListSupplierResponseDTO(changed);
     }
 }

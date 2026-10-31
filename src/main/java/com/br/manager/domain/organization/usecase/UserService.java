@@ -137,7 +137,7 @@ public class UserService {
         var since = synchronize.getLastSynchronize();
         if (since == null) {
             // se não houver data, considerar desde a época Unix para garantir consistência
-            since = LocalDateTime.of(1970, 1, 1, 0, 0, 0);
+            since = LocalDateTime.of(2026, 1, 1, 0, 0, 0);
         }
         List<User> changed = userRepository.findAllChangedSince(since);
         return userMapper.listUserToListUserResponseDTO(changed);

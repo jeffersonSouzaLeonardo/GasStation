@@ -13,7 +13,6 @@ import com.br.manager.domain.organization.repository.UserRepository;
 import com.br.manager.domain.shift_cachs.entity.Shift;
 import com.br.manager.domain.shift_cachs.enums.ShiftStatusEnum;
 import com.br.manager.domain.shift_cachs.repository.ShiftRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,20 +24,24 @@ import java.util.UUID;
 @Service
 public class ShiftValidationSupport {
 
-    @Autowired
-    private ShiftRepository shiftRepository;
+    private final ShiftRepository shiftRepository;
+    private final StationRepository stationRepository;
+    private final UserRepository userRepository;
+    private final PumpRepository pumpRepository;
+    private final NozzleRepository nozzleRepository;
 
-    @Autowired
-    private StationRepository stationRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PumpRepository pumpRepository;
-
-    @Autowired
-    private NozzleRepository nozzleRepository;
+    public ShiftValidationSupport(
+            ShiftRepository shiftRepository,
+            StationRepository stationRepository,
+            UserRepository userRepository,
+            PumpRepository pumpRepository,
+            NozzleRepository nozzleRepository) {
+        this.shiftRepository = shiftRepository;
+        this.stationRepository = stationRepository;
+        this.userRepository = userRepository;
+        this.pumpRepository = pumpRepository;
+        this.nozzleRepository = nozzleRepository;
+    }
 
     public Shift getRequiredShift(UUID shiftId) {
         return shiftRepository.findById(shiftId)
@@ -61,10 +64,11 @@ public class ShiftValidationSupport {
     }
 
     public User getRequiredUser(UUID userId, String fieldName) {
+        String field = fieldName == null || fieldName.isBlank() ? "usuário" : fieldName;
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", userId)));
+                .orElseThrow(() -> new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado no campo %s", userId, field)));
         if (!Boolean.TRUE.equals(user.getActive())) {
-            throw new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado", userId));
+            throw new NotFoundBusinessException(String.format("Usuário com ID %s não encontrado no campo %s", userId, field));
         }
         return user;
     }
@@ -83,15 +87,11 @@ public class ShiftValidationSupport {
             return List.of();
         }
 
-        Set<UUID> pumpIds = new HashSet<>();
-        for (Pump pump : pumps) {
-            pumpIds.add(pump.getId());
-        }
-
         Set<UUID> seenNozzles = new HashSet<>();
         List<Nozzle> stationNozzles = new ArrayList<>();
-        for (UUID pumpId : pumpIds) {
-            List<Nozzle> nozzles = nozzleRepository.findByPumpIdAndActiveTrue(pumpId);
+
+        for (Pump pump : pumps) {
+            List<Nozzle> nozzles = nozzleRepository.findByPumpIdAndActiveTrue(pump.getId());
             for (Nozzle nozzle : nozzles) {
                 if (seenNozzles.add(nozzle.getId())) {
                     stationNozzles.add(nozzle);

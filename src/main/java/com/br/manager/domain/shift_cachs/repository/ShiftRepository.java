@@ -14,4 +14,6 @@ public interface ShiftRepository extends JpaRepository<Shift, UUID> {
     Optional<Shift> findByIdAndStatus(UUID id, ShiftStatusEnum status);
 
     boolean existsByStationIdAndCashierUserIdAndStatus(UUID stationId, UUID cashierUserId, ShiftStatusEnum status);
+
+    boolean existsByStationIdAndStatus(UUID stationId, ShiftStatusEnum status);
 }

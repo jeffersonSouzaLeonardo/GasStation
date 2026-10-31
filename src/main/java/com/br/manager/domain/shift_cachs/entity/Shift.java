@@ -4,6 +4,7 @@ import com.br.manager.domain.shift_cachs.enums.ShiftStatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -51,8 +52,18 @@ public class Shift {
     @Column(name = "closed_by")
     private UUID closedBy;
 
+    @Column(name = "name", length = 120)
+    private String name;
+
     @Column(name = "notes", length = 500)
     private String notes;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "shift", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShiftAllocation> allocations = new ArrayList<>();
@@ -137,12 +148,36 @@ public UUID getId() {
         this.closedBy = closedBy;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getNotes() {
         return notes;
     }
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 
     public List<ShiftAllocation> getAllocations() {

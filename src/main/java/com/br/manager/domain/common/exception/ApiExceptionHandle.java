@@ -25,7 +25,7 @@ public class ApiExceptionHandle extends ResponseEntityExceptionHandler {
         error.setStatus(HttpStatus.BAD_REQUEST.toString());
         error.setInstance(request.getDescription(false).replace("uri", ""));
         error.setTimestamp(LocalDateTime.now());
-        error.setTitle(e.getCause().getMessage());
+        error.setTitle(e.getCause() != null ? e.getCause().getMessage() : e.getMessage());
         error.setValidationErrors(e.getMessage() != null ? List.of(e.getMessage()) : List.of());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }

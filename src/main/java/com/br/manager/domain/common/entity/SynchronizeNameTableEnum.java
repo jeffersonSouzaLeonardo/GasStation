@@ -3,7 +3,14 @@ package com.br.manager.domain.common.entity;
 public enum SynchronizeNameTableEnum {
     USER,
     COMPANY,
-    STATION;
+    STATION,
+    NOZZLE,
+    PRODUCT,
+    PUMP,
+    TANK,
+    SUPPLIER,
+    SHIFT,
+    CASH_SESSION;
 
     private final String tableName;
 

@@ -77,3 +77,33 @@ src/                                         # raiz do código-fonte
 3. `infra` implementa detalhes técnicos (HTTP, banco, multitenancy, migrações).
 4. DTO de entrada/saída de API fica fora de `domain`.
 5. Repositório do domínio é interface; implementação concreta fica em `infra/persistence`.
+
+## Testes automatizados
+
+Stack: **JUnit 5**, **Mockito**, **AssertJ**, **RestAssured** e **Testcontainers (MySQL)**.
+
+Pré-requisito: Docker em execução (Docker Engine 29+ suportado via Testcontainers 1.21.4+).
+
+```bash
+./mvnw test                                   # executa todos os testes (unitários + integração)
+./mvnw test -Dtest='*ServiceTest'             # apenas um grupo
+./mvnw test -Dtest.mysql.image=mysql:9-oracle # outra imagem do MySQL
+```
+
+Relatório de cobertura (JaCoCo): `target/site/jacoco/index.html`.
+
+| Tipo | Sufixo | Como funciona |
+|------|--------|---------------|
+| Mapper | `*MapperTest` | teste unitário puro |
+| Service / usecase | `*ServiceTest` | Mockito (`@Mock` / `@InjectMocks`) |
+| DTO | `DtoContractTest` | verifica automaticamente getters/setters/records de todos os DTOs |
+| Controller | `*ControllerIT` | RestAssured contra a aplicação real (`RANDOM_PORT`) + MySQL em container |
+
+Infraestrutura em `src/test/java/com/br/manager/support`:
+
+- `container/MySQLTestContainer` – container MySQL único (singleton) para toda a execução, com as migrações Flyway aplicadas.
+- `integration/AbstractIntegrationTest` – base dos testes de API; configura datasource, RestAssured (`request()`) e limpa o banco antes de cada teste.
+- `database/DatabaseCleaner` – trunca as tabelas preservando `flyway_schema_history` e os dados de seed de `synchronize`.
+- `contract/DtoContractVerifier` – verificador genérico de contrato de DTOs.
+
+Massas de dados ficam em `domain/<contexto>/fixture/*Fixture`.

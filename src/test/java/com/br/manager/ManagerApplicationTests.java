@@ -1,12 +1,9 @@
 package com.br.manager;
 
+import com.br.manager.support.integration.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class ManagerApplicationTests {
+class ManagerApplicationTests extends AbstractIntegrationTest {
 
 	@Test
 	void contextLoads() {

@@ -2,9 +2,6 @@ package com.br.manager.domain.shift_cachs.service;
 
 import com.br.manager.domain.common.exception.BusinessException;
 import com.br.manager.domain.operational.entity.Nozzle;
-import com.br.manager.domain.operational.repository.NozzleRepository;
-import com.br.manager.domain.organization.entity.Station;
-import com.br.manager.domain.organization.entity.User;
 import com.br.manager.domain.shift_cachs.dto.ShiftAllocationInputDTO;
 import com.br.manager.domain.shift_cachs.dto.ShiftOpenRequestDTO;
 import com.br.manager.domain.shift_cachs.dto.ShiftResponseDTO;
@@ -19,7 +16,6 @@ import com.br.manager.domain.shift_cachs.repository.NozzleReadingRepository;
 import com.br.manager.domain.shift_cachs.repository.ShiftAllocationRepository;
 import com.br.manager.domain.shift_cachs.repository.ShiftRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -29,26 +25,27 @@ import java.util.UUID;
 @Service
 public class ShiftOpeningService {
 
-    @Autowired
-    private ShiftRepository shiftRepository;
+    private final ShiftRepository shiftRepository;
+    private final ShiftAllocationRepository allocationRepository;
+    private final NozzleReadingRepository nozzleReadingRepository;
+    private final ShiftValidationSupport validationSupport;
+    private final ShiftMapper shiftMapper;
+    private final ShiftAllocationMapper shiftAllocationMapper;
 
-    @Autowired
-    private ShiftAllocationRepository allocationRepository;
-
-    @Autowired
-    private NozzleReadingRepository nozzleReadingRepository;
-
-    @Autowired
-    private ShiftValidationSupport validationSupport;
-
-    @Autowired
-    private ShiftMapper shiftMapper;
-
-    @Autowired
-    private ShiftAllocationMapper shiftAllocationMapper;
-
-    @Autowired
-    private NozzleRepository nozzleRepository;
+    public ShiftOpeningService(
+            ShiftRepository shiftRepository,
+            ShiftAllocationRepository allocationRepository,
+            NozzleReadingRepository nozzleReadingRepository,
+            ShiftValidationSupport validationSupport,
+            ShiftMapper shiftMapper,
+            ShiftAllocationMapper shiftAllocationMapper) {
+        this.shiftRepository = shiftRepository;
+        this.allocationRepository = allocationRepository;
+        this.nozzleReadingRepository = nozzleReadingRepository;
+        this.validationSupport = validationSupport;
+        this.shiftMapper = shiftMapper;
+        this.shiftAllocationMapper = shiftAllocationMapper;
+    }
 
     @Transactional
     public ShiftResponseDTO openShift(ShiftOpenRequestDTO request) {
@@ -56,9 +53,27 @@ public class ShiftOpeningService {
             throw new BusinessException("O payload de abertura do turno é obrigatório.");
         }
 
-        Station station = validationSupport.getRequiredStation(request.getStationId());
-        User cashier = validationSupport.getRequiredUser(request.getCashierUserId(), "cashierUserId");
-        User openedByUser = validationSupport.getRequiredUser(request.getOpenedBy(), "openedBy");
+        validationSupport.getRequiredStation(request.getStationId());
+        validationSupport.getRequiredUser(request.getCashierUserId(), "cashierUserId");
+        validationSupport.getRequiredUser(request.getOpenedBy(), "openedBy");
+        validateNoOpenShiftForStationAndCashier(request);
+
+        Shift shift = shiftMapper.toEntity(request);
+        shift.setStatus(ShiftStatusEnum.OPEN);
+        shift.setOpenedAt(LocalDateTime.now());
+
+        Shift savedShift = shiftRepository.saveAndFlush(shift);
+        registerAllocations(savedShift, request);
+        registerOpeningNozzleReadings(savedShift, request.getOpenedBy());
+        return shiftMapper.toResponse(savedShift);
+    }
+
+    private void validateNoOpenShiftForStationAndCashier(ShiftOpenRequestDTO request) {
+        if (shiftRepository.existsByStationIdAndStatus(request.getStationId(), ShiftStatusEnum.OPEN)) {
+            throw new BusinessException(String.format(
+                    "Já existe um turno ABERTO para o posto %s. Apenas um turno pode estar ativo por estação.",
+                    request.getStationId()));
+        }
 
         if (shiftRepository.existsByStationIdAndCashierUserIdAndStatus(
                 request.getStationId(), request.getCashierUserId(), ShiftStatusEnum.OPEN)) {
@@ -66,26 +81,21 @@ public class ShiftOpeningService {
                     "Já existe um turno ABERTO para o posto %s e o caixa %s.",
                     request.getStationId(), request.getCashierUserId()));
         }
+    }
 
-        Shift shift = shiftMapper.toEntity(request);
-        shift.setStatus(ShiftStatusEnum.OPEN);
-        shift.setOpenedAt(LocalDateTime.now());
-
-        Shift savedShift = shiftRepository.saveAndFlush(shift);
-
-        if (request.getAllocations() != null) {
-            for (ShiftAllocationInputDTO allocationDto : request.getAllocations()) {
-                if (allocationDto == null) {
-                    continue;
-                }
-                validationSupport.getRequiredUser(allocationDto.getUserId(), "allocationUserId");
-                ShiftAllocation allocation = shiftAllocationMapper.toEntity(allocationDto, savedShift);
-                allocationRepository.saveAndFlush(allocation);
-            }
+    private void registerAllocations(Shift shift, ShiftOpenRequestDTO request) {
+        if (request.getAllocations() == null) {
+            return;
         }
 
-        registerOpeningNozzleReadings(savedShift, request.getOpenedBy());
-        return shiftMapper.toResponse(savedShift);
+        for (ShiftAllocationInputDTO allocationDto : request.getAllocations()) {
+            if (allocationDto == null) {
+                continue;
+            }
+            validationSupport.getRequiredUser(allocationDto.getUserId(), "allocationUserId");
+            ShiftAllocation allocation = shiftAllocationMapper.toEntity(allocationDto, shift);
+            allocationRepository.saveAndFlush(allocation);
+        }
     }
 
     private void registerOpeningNozzleReadings(Shift shift, UUID recordedBy) {

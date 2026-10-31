@@ -2,6 +2,7 @@ package com.br.manager.domain.operational.usecase;
 
 import com.br.manager.domain.common.exception.BusinessException;
 import com.br.manager.domain.common.exception.NotFoundBusinessException;
+import com.br.manager.domain.common.service.SynchronizeService;
 import com.br.manager.domain.operational.dto.PumpInputDTO;
 import com.br.manager.domain.operational.dto.PumpResponseDTO;
 import com.br.manager.domain.operational.entity.Pump;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +27,9 @@ public class PumpService {
 
     @Autowired
     private PumpMapper pumpMapper;
+
+    @Autowired
+    private SynchronizeService synchronizeService;
 
     public PumpResponseDTO create(PumpInputDTO inputDTO) {
         try {
@@ -86,6 +91,7 @@ public class PumpService {
             Pump entity = pumpRepository.findById(id)
                     .orElseThrow(() -> new NotFoundBusinessException(String.format("Bomba com ID %s não encontrada", id)));
             entity.setActive(false);
+            entity.setDeletedAt(LocalDateTime.now());
             pumpRepository.saveAndFlush(entity);
         } catch (ConstraintViolationException exception) {
             throw new BusinessException(exception.getConstraintViolations().stream()
@@ -105,5 +111,19 @@ public class PumpService {
             throw new NotFoundBusinessException(String.format("Bomba com ID %s não encontrada", id));
         }
         return entity;
+    }
+
+    /**
+     * Retorna registros criados, atualizados ou deletados após a última sincronização da tabela informada.
+     */
+    public List<PumpResponseDTO> findChangedSinceSynchronize(String tableName) {
+        var synchronize = synchronizeService.findByTableName(tableName);
+        var since = synchronize.getLastSynchronize();
+        if (since == null) {
+            // se não houver data, considerar desde a época Unix para garantir consistência
+            since = LocalDateTime.of(2026, 1, 1, 0, 0, 0);
+        }
+        List<Pump> changed = pumpRepository.findAllChangedSince(since);
+        return pumpMapper.listPumpToListPumpResponseDTO(changed);
     }
 }

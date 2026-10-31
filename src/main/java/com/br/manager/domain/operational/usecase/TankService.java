@@ -2,6 +2,7 @@ package com.br.manager.domain.operational.usecase;
 
 import com.br.manager.domain.common.exception.BusinessException;
 import com.br.manager.domain.common.exception.NotFoundBusinessException;
+import com.br.manager.domain.common.service.SynchronizeService;
 import com.br.manager.domain.operational.dto.TankInputDTO;
 import com.br.manager.domain.operational.dto.TankResponseDTO;
 import com.br.manager.domain.operational.entity.Product;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +32,9 @@ public class TankService {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private SynchronizeService synchronizeService;
 
     public TankResponseDTO create(TankInputDTO inputDTO) {
         try {
@@ -100,6 +105,7 @@ public class TankService {
             Tank tank = tankRepository.findById(id)
                     .orElseThrow(() -> new NotFoundBusinessException(String.format("Tanque com ID %s não encontrado", id)));
             tank.setActive(false);
+            tank.setDeletedAt(LocalDateTime.now());
             tankRepository.saveAndFlush(tank);
         } catch (ConstraintViolationException exception) {
             throw new BusinessException(exception.getConstraintViolations().stream()
@@ -119,5 +125,19 @@ public class TankService {
             throw new NotFoundBusinessException(String.format("Tanque com ID %s não encontrado", id));
         }
         return tank;
+    }
+
+    /**
+     * Retorna registros criados, atualizados ou deletados após a última sincronização da tabela informada.
+     */
+    public List<TankResponseDTO> findChangedSinceSynchronize(String tableName) {
+        var synchronize = synchronizeService.findByTableName(tableName);
+        var since = synchronize.getLastSynchronize();
+        if (since == null) {
+            // se não houver data, considerar desde a época Unix para garantir consistência
+            since = LocalDateTime.of(2026, 1, 1, 0, 0, 0);
+        }
+        List<Tank> changed = tankRepository.findAllChangedSince(since);
+        return tankMapper.listTankEntityToListTankResponseDTO(changed);
     }
 }
