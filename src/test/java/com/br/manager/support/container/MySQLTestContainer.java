@@ -11,14 +11,14 @@ import org.testcontainers.utility.DockerImageName;
 public final class MySQLTestContainer {
 
     private static final String DEFAULT_IMAGE = "mysql:8.4";
-    private static final String DATABASE_NAME = "manager_test";
+    private static final String DATABASE_NAME = "gerente_test";
 
     private static final MySQLContainer<?> INSTANCE = createContainer();
 
     private MySQLTestContainer() {
     }
 
-    public static MySQLContainer<?> getInstance() {
+    public static MySQLContainer<?> getINSTANCE() {
         return INSTANCE;
     }
 

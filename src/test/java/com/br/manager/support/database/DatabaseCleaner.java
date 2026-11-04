@@ -13,7 +13,7 @@ import java.util.Set;
 @TestComponent
 public class DatabaseCleaner {
 
-    private static final Set<String> PRESERVED_TABLES = Set.of("flyway_schema_history", "synchronize");
+    private static final Set<String> PRESERVED_TABLES = Set.of("flyway_schema_history", "sincronizacao");
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -25,8 +25,8 @@ public class DatabaseCleaner {
         List<String> tables = findTablesToClean();
         jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
         try {
-            tables.forEach(table -> jdbcTemplate.execute("TRUNCATE TABLE `" + table + "`"));
-            jdbcTemplate.update("UPDATE synchronize SET last_synchronize = NULL");
+            tables.forEach(tabela -> jdbcTemplate.execute("TRUNCATE TABLE `" + tabela + "`"));
+            jdbcTemplate.update("UPDATE sincronizacao SET ultima_sincronizacao = NULL");
         } finally {
             jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
         }
@@ -38,7 +38,7 @@ public class DatabaseCleaner {
                                 + "WHERE table_schema = DATABASE() AND table_type = 'BASE TABLE'",
                         String.class)
                 .stream()
-                .filter(table -> !PRESERVED_TABLES.contains(table.toLowerCase()))
+                .filter(tabela -> !PRESERVED_TABLES.contains(tabela.toLowerCase()))
                 .toList();
     }
 }

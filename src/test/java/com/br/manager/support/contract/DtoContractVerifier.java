@@ -39,7 +39,7 @@ public final class DtoContractVerifier {
         Object instance = BeanUtils.instantiateClass(dtoType);
         for (PropertyDescriptor property : readWriteProperties(dtoType)) {
             Method setter = property.getWriteMethod();
-            Object sample = SampleValueFactory.sampleFor(property.getPropertyType(), setter.getGenericParameterTypes()[0]);
+            Object sample = SampleValorFactory.sampleFor(property.getPropertyType(), setter.getGenericParameterTypes()[0]);
 
             setter.invoke(instance, sample);
 

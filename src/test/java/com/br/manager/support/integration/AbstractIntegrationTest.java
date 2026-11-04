@@ -30,7 +30,7 @@ import static io.restassured.RestAssured.given;
 public abstract class AbstractIntegrationTest {
 
     protected static final String TENANT_HEADER = "x-tenant-id";
-    protected static final String TEST_TENANT = "manager";
+    protected static final String TEST_TENANT = "gerente";
 
     @LocalServerPort
     private int port;
@@ -40,7 +40,7 @@ public abstract class AbstractIntegrationTest {
 
     @DynamicPropertySource
     static void registerDatabaseProperties(DynamicPropertyRegistry registry) {
-        MySQLContainer<?> mysql = MySQLTestContainer.getInstance();
+        MySQLContainer<?> mysql = MySQLTestContainer.getINSTANCE();
         registry.add("spring.datasource.url", mysql::getJdbcUrl);
         registry.add("spring.datasource.username", mysql::getUsername);
         registry.add("spring.datasource.password", mysql::getPassword);

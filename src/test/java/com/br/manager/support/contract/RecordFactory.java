@@ -14,7 +14,7 @@ final class RecordFactory {
 
     static Object[] sampleArguments(Class<?> recordType) {
         return Arrays.stream(recordType.getRecordComponents())
-                .map(component -> SampleValueFactory.sampleFor(component.getType(), component.getGenericType()))
+                .map(component -> SampleValorFactory.sampleFor(component.getType(), component.getGenericType()))
                 .toArray();
     }
 

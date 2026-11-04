@@ -22,7 +22,7 @@ class DtoContractTest {
 
     private static final String BASE_PACKAGE = "com.br.manager.domain";
     private static final Pattern DTO_PATTERN = Pattern.compile(".*\\.dto\\..*|.*DTO");
-    private static final int MINIMUM_EXPECTED_DTOS = 70;
+    private static final int MINIMUM_ESPERADO_DTOS = 70;
 
     static Stream<Class<?>> allDtos() {
         ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
@@ -41,6 +41,6 @@ class DtoContractTest {
 
     @Test
     void shouldDiscoverAllApplicationDtos() {
-        assertThat(allDtos().count()).isGreaterThanOrEqualTo(MINIMUM_EXPECTED_DTOS);
+        assertThat(allDtos().count()).isGreaterThanOrEqualTo(MINIMUM_ESPERADO_DTOS);
     }
 }
